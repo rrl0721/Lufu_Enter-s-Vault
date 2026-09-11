@@ -321,11 +321,33 @@ export function getSocial(): Promise<SocialData> {
     } catch (e) {
       console.warn('[social] steam fetch failed, using cache:', String(e));
     }
-    const data = {
-      bilibili: bilibili as BiliInfo,
-      steam: steam as SteamInfo,
+    // 图片一律优先用仓库里的本地文件(缓存中的路径), 不依赖构建环境的文件系统/网络
+    const cb = cache.bilibili;
+    const cs = cache.steam;
+    const merged: SocialData = {
+      bilibili: bilibili
+        ? {
+            ...bilibili,
+            avatarLocal: cb?.avatarLocal || bilibili.avatarLocal || '',
+            bangumi: bilibili.bangumi.map((b, i) => ({
+              ...b,
+              coverLocal: cb?.bangumi?.[i]?.coverLocal || b.coverLocal || '',
+            })),
+            favFolders: bilibili.favFolders.map((f, fi) => ({
+              ...f,
+              items: f.items.map((it, ii) => ({
+                ...it,
+                coverLocal: cb?.favFolders?.[fi]?.items?.[ii]?.coverLocal || it.coverLocal || '',
+              })),
+            })),
+          }
+        : (cb as BiliInfo),
+      steam: steam
+        ? { ...steam, avatarLocal: cs?.avatarLocal || steam.avatarLocal || '' }
+        : (cs as SteamInfo),
       updatedAt: new Date().toISOString(),
     };
+    const data = merged;
     try {
       fs.mkdirSync(path.dirname(CACHE_PATH), { recursive: true });
       fs.writeFileSync(CACHE_PATH, JSON.stringify(data, null, 2));
