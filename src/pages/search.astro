@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="搜索" description="全文搜索">
+  <section class="search-wrap wrap">
+    <h1 class="reveal">搜索</h1>
+    <p class="reveal" style="color:var(--muted)">全文搜索（由 <a href="https://pagefind.app" target="_blank" rel="noopener">Pagefind</a> 提供）。</p>
+    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+    <div id="search" class="reveal"></div>
+  </section>
+
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    function initSearch() {
+      var el = document.getElementById('search');
+      if (!el || el.dataset.init) return;
+      if (window.PagefindUI) {
+        el.dataset.init = '1';
+        new window.PagefindUI({ element: '#search', showSubResults: true,
+          translations: { placeholder: '搜索文章…', zero_results: '没有找到「[SEARCH_TERM]」' } });
+      } else {
+        el.innerHTML = '<p style="color:var(--muted)">搜索索引在<b>构建后</b>生成：跑 <code>npm run build</code> 再 <code>npm run preview</code> 即可用（dev 模式没有索引）。</p>';
+      }
+    }
+    document.addEventListener('astro:page-load', initSearch);
+    if (document.readyState !== 'loading') initSearch();
+    else document.addEventListener('DOMContentLoaded', initSearch);
+  </script>
+</Base>

@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import AboutTabs from '../components/AboutTabs.astro';
+import { getSocial } from '../lib/social';
+
+const { bilibili, steam } = await getSocial();
+const steamState: Record<string, string> = {
+  online: '在线', offline: '离线', 'in-game': '游戏中', away: '离开', snooze: '打盹', busy: '忙碌',
+};
+---
+<Base title="关于">
+  <article class="article wrap">
+    <AboutTabs />
+    <h1 class="reveal">关于</h1>
+    <div class="prose reveal">
+      <p>你好，我是 <strong>Lufu</strong>。这里是我的个人小站。</p>
+      <p>平时喜欢折腾 Linux、写点小工具、看看书和电影。这个站用来放一些不适合发在别处的东西。</p>
+      <h2>我的主页</h2>
+      <div class="home-links">
+        <a class="home-link bili" href="/about/bilibili/">
+          <span class="hl-title">哔哩哔哩</span>
+          <span class="hl-sub">{bilibili.name} · 粉丝 {bilibili.fans}</span>
+        </a>
+        <a class="home-link steam" href="/about/steam/">
+          <span class="hl-title">Steam</span>
+          <span class="hl-sub">{steam.name} · {steamState[steam.state] || steam.state}</span>
+        </a>
+      </div>
+      <h2>关于本站</h2>
+      <ul>
+        <li>用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 搭建</li>
+        <li>托管在 <a href="https://pages.cloudflare.com" target="_blank" rel="noopener">Cloudflare Pages</a></li>
+        <li>源码在 <a href="https://github.com/rrl0721" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
+      <h2>联系我</h2>
+      <ul>
+        <li>邮箱：<a href="mailto:1510518297@qq.com">1510518297@qq.com</a> / <a href="mailto:lzr20071130@outlook.com">lzr20071130@outlook.com</a></li>
+        <li>GitHub：<a href="https://github.com/rrl0721" target="_blank" rel="noopener">rrl0721</a></li>
+      </ul>
+    </div>
+  </article>
+</Base>

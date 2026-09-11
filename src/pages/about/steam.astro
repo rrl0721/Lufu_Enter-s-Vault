@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import AboutTabs from '../../components/AboutTabs.astro';
+import { getSocial } from '../../lib/social';
+
+const { steam, updatedAt } = await getSocial();
+const avatar = steam.avatarLocal || steam.avatar;
+const stateMap: Record<string, string> = {
+  online: '在线',
+  offline: '离线',
+  'in-game': '游戏中',
+  away: '离开',
+  snooze: '打盹',
+  busy: '忙碌',
+};
+const stateLabel = stateMap[steam.state] || steam.state;
+---
+<Base title="Steam">
+  <article class="article wrap profile-page">
+    <AboutTabs />
+    <div class="profile-kicker">关于 · 我的主页</div>
+    <h1>Steam</h1>
+
+    <div class="profile-card steam">
+      <div class="profile-head">
+        <img class="profile-avatar" src={avatar} alt={steam.name} width="96" height="96" />
+        <div>
+          <div class="profile-name">{steam.name}</div>
+          <div class={`state-badge ${steam.state}`}><span class="dot"></span>{stateLabel}</div>
+          {steam.stateText && steam.state !== 'offline' && <div class="profile-sign">{steam.stateText}</div>}
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><b>{steam.gamesTotal || '—'}</b><span>游戏数</span></div>
+        <div class="stat-box"><b>{steam.hours2wk || '0'}</b><span>最近两周(h)</span></div>
+        <div class="stat-box"><b>{steam.games.length || '—'}</b><span>最近游戏</span></div>
+        <div class="stat-box"><b>{steam.vacBanned ? '有' : '无'}</b><span>VAC 封禁</span></div>
+      </div>
+      <div class="profile-meta">
+        {steam.memberSince && <span>加入于 {steam.memberSince}</span>}
+        {steam.location && <span>所在地 {steam.location}</span>}
+      </div>
+    </div>
+
+    {steam.games.length > 0 && (
+      <section class="media-section">
+        <div class="section-sub"><h2>最近游戏</h2>共 {steam.gamesTotal} 款游戏</div>
+        <div class="game-list">
+          {steam.games.map((g) => (
+            <div class="game-row">
+              <span class="game-name">{g.name}</span>
+              <span class="game-hours">{g.hours}h{g.lastPlayed ? ` · ${g.lastPlayed}` : ''}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <nav class="pager">
+      <a href="/about/bilibili/">← 哔哩哔哩</a>
+      <a href="/about/">关于 →</a>
+    </nav>
+    <div class="profile-updated">资料更新于 {updatedAt.slice(0, 10)}</div>
+  </article>
+</Base>

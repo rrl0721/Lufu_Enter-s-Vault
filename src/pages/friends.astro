@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+
+// 友链：之后把朋友的 blog 填进来
+const friends = [
+  { name: '示例朋友 A', url: 'https://example.com', desc: '写点技术' },
+  { name: '示例朋友 B', url: 'https://example.org', desc: '生活与摄影' },
+];
+---
+<Base title="友链">
+  <article class="article wrap">
+    <h1 class="reveal">友链</h1>
+    <p class="reveal" style="color:var(--muted)">一些朋友的小站，欢迎去看看。</p>
+    <div class="friends reveal">
+      {friends.map((f) => (
+        <a class="friend" href={f.url} target="_blank" rel="noopener">
+          <span class="avatar"></span>
+          <span>{f.name}</span>
+        </a>
+      ))}
+    </div>
+    <p class="reveal" style="color:var(--muted);margin-top:24px;font-size:14px">
+      想交换友链？在文章下留言，或邮件联系我。
+    </p>
+  </article>
+</Base>

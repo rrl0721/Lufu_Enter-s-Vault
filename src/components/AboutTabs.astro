@@ -1,0 +1,16 @@
+---
+const path = Astro.url.pathname;
+const tabs = [
+  { href: '/about/', label: '关于' },
+  { href: '/about/bilibili/', label: '哔哩哔哩' },
+  { href: '/about/steam/', label: 'Steam' },
+];
+---
+<div class="about-tabs">
+  {tabs.map((t) => (
+    <a
+      href={t.href}
+      class:list={[{ active: t.href === '/about/' ? path === '/about/' : path.startsWith(t.href) }]}
+    >{t.label}</a>
+  ))}
+</div>

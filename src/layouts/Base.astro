@@ -1,0 +1,101 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/source-serif-4';
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props { title?: string; description?: string; bodyClass?: string; }
+const { title = 'Lufu_Enter', description = '一个属于我的小站', bodyClass = '' } = Astro.props;
+const site = 'Lufu_Enter';
+const pathname = Astro.url.pathname;
+const links = [
+  { href: '/', label: '首页' },
+  { href: '/search/', label: '搜索' },
+  { href: '/about/', label: '关于' },
+  { href: '/friends/', label: '友链' },
+];
+---
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>{title === site ? title : `${title} · ${site}`}</title>
+  <meta name="description" content={description} />
+  <meta name="generator" content={Astro.generator} />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="alternate" type="application/rss+xml" title="Lufu_Enter" href="/rss.xml" />
+  <ClientRouter />
+</head>
+<body class={bodyClass}>
+  <header class="site-header">
+    <div class="wrap dock">
+      <a class="brand" href="/">{site}<span class="dot">.</span></a>
+      <nav class="nav">
+        {links.map((l) => (
+          <a
+            href={l.href}
+            class:list={[{ active: l.href === '/' ? pathname === '/' : pathname.startsWith(l.href) }]}
+          >{l.label}</a>
+        ))}
+      </nav>
+    </div>
+  </header>
+
+  <main><slot /></main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© {new Date().getFullYear()} {site} · 用 Astro 搭建</span>
+      <span>Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a></span>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
+
+  {/* 图片灯箱 */}
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightboxImg" alt="" />
+  </div>
+
+  <script>
+    function init() {
+      // 滚动出现动画
+      const io = new IntersectionObserver((es) => {
+        for (const e of es) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal:not(.in)').forEach((el) => io.observe(el));
+
+      // 回到顶部
+      const top = document.getElementById('toTop');
+      const onScroll = () => { if (top) top.classList.toggle('show', scrollY > 420); };
+      onScroll();
+      addEventListener('scroll', onScroll, { passive: true });
+      if (top) top.onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 图片灯箱
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lightboxImg') as HTMLImageElement | null;
+      document.querySelectorAll('.prose img').forEach((img) => {
+        (img as HTMLImageElement).style.cursor = 'zoom-in';
+        (img as HTMLImageElement).onclick = () => {
+          if (!lb || !lbImg) return;
+          lbImg.src = (img as HTMLImageElement).src;
+          lb.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        };
+      });
+      const close = () => { if (lb) lb.classList.remove('show'); document.body.style.overflow = ''; };
+      if (lb) lb.onclick = close;
+      addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    }
+
+    document.addEventListener('astro:page-load', init);
+    // 无 ClientRouter 时兜底
+    if (document.readyState !== 'loading') init();
+    else document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

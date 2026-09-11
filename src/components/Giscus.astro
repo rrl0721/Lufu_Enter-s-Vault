@@ -1,0 +1,44 @@
+---
+interface Props {
+  repo?: string;        // 例: "yourname/yourrepo"
+  repoId?: string;      // giscus.app 生成
+  category?: string;    // 例: "Announcements"
+  categoryId?: string;  // giscus.app 生成
+}
+const {
+  repo = 'owner/repo',
+  repoId = '',
+  category = 'Announcements',
+  categoryId = '',
+} = Astro.props;
+const configured = Boolean(repoId && categoryId);
+---
+<section class="comments">
+  <div class="section-title">评论</div>
+  {configured ? (
+    <div class="giscus"></div>
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo={repo}
+      data-repo-id={repoId}
+      data-category={category}
+      data-category-id={categoryId}
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="dark"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async></script>
+  ) : (
+    <p style="color:var(--muted);font-size:14px">
+      评论区还没配置。去 <a href="https://giscus.app" target="_blank" rel="noopener">giscus.app</a>
+      生成配置，把 <code>repoId</code> / <code>categoryId</code> 填进
+      <code>src/components/Giscus.astro</code> 即可（需要仓库开启 Discussions + 装 giscus App）。
+    </p>
+  )}
+</section>
