@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import https from 'node:https';
+import cacheJson from '../data/social-cache.json';
+
 const UID = '3546622048864404';
 const STEAM_ID = '76561199888306296';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0';
@@ -306,9 +308,13 @@ export function getSocial(): Promise<SocialData> {
   if (pending && (import.meta.env.PROD || now - pendingAt < 60_000)) return pending;
   pendingAt = now;
   pending = (async () => {
-    const cache: Partial<SocialData> = fs.existsSync(CACHE_PATH)
-      ? JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'))
-      : {};
+    let cache: Partial<SocialData> = cacheJson as Partial<SocialData>;
+    try {
+      if (fs.existsSync(CACHE_PATH)) cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+    } catch {
+      /* 用打包进来的缓存 */
+    }
+    console.log('[social] cache source:', fs.existsSync(CACHE_PATH) ? 'fs' : 'bundled');
     let bilibili = cache.bilibili;
     let steam = cache.steam;
     try {
