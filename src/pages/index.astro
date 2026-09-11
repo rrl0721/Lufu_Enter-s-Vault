@@ -1,8 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import heroArt from '../assets/hero-art.png';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -10,14 +8,13 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
 <Base>
   <section class="hero">
     <canvas class="hero-dots" aria-hidden="true"></canvas>
-    <Image
+    <img
       class="hero-bg"
-      src={heroArt}
+      src="/hero-art.webp"
       alt=""
       aria-hidden="true"
-      widths={[480, 700, 960]}
-      sizes="(max-width: 720px) 100vw, 46vw"
-      width={960}
+      width="1000"
+      height="1000"
       loading="eager"
       fetchpriority="high"
     />

@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import https from 'node:https';
-
 const UID = '3546622048864404';
 const STEAM_ID = '76561199888306296';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0';
@@ -131,19 +130,22 @@ async function get(url: string, headers: Record<string, string> = {}): Promise<R
 
 async function saveImage(url: string, name: string): Promise<string> {
   if (!url) return '';
-  const ext = url.includes('.png') ? 'png' : 'jpg';
+  const clean = url.replace(/^http:\/\//, 'https://');
+  const ext = clean.includes('.png') ? 'png' : 'jpg';
   const local = `/social/${name}.${ext}`;
+  // 仓库已有本地图 → 直接使用, 不依赖网络
+  if (fs.existsSync(path.join(PUBLIC_DIR, `${name}.${ext}`))) return local;
   try {
-    const r = await get(url);
+    const r = await get(clean);
     if (r.status === 200 && r.body.length > 200) {
       fs.mkdirSync(PUBLIC_DIR, { recursive: true });
       fs.writeFileSync(path.join(PUBLIC_DIR, `${name}.${ext}`), r.body);
       return local;
     }
   } catch {
-    /* 保留旧图 */
+    /* ignore */
   }
-  return fs.existsSync(path.join(PUBLIC_DIR, `${name}.${ext}`)) ? local : '';
+  return '';
 }
 
 async function fetchBangumi(): Promise<{ items: BangumiItem[]; total: number; isPublic: boolean }> {
@@ -157,7 +159,7 @@ async function fetchBangumi(): Promise<{ items: BangumiItem[]; total: number; is
     for (const b of raw.data.list) {
       items.push({
         title: b.title || '',
-        cover: b.cover || '',
+        cover: (b.cover || '').replace(/^http:\/\//, 'https://'),
         coverLocal: await saveImage(b.cover, `bangumi-${i++}`),
         type: b.season_type_name || '',
       });
@@ -188,7 +190,7 @@ async function fetchFavs(): Promise<FavFolder[]> {
           for (const m of medias) {
             folder.items.push({
               title: m.title || '',
-              cover: m.cover || '',
+              cover: (m.cover || '').replace(/^http:\/\//, 'https://'),
               coverLocal: await saveImage(m.cover, `fav-${out.length}-${i++}`),
             });
           }
@@ -217,7 +219,7 @@ async function fetchBilibili(): Promise<BiliInfo> {
   const favFolders = await fetchFavs();
   return {
     name: c.name,
-    avatar: c.face || '',
+    avatar: (c.face || '').replace(/^http:\/\//, 'https://'),
     avatarLocal: await saveImage(c.face, 'bilibili'),
     sign: c.sign || '',
     fans: c.fans ?? 0,
@@ -276,7 +278,7 @@ async function fetchSteam(): Promise<SteamInfo> {
   };
   const name = tag('steamID');
   if (!name) throw new Error('steam xml empty');
-  const avatar = tag('avatarFull');
+  const avatar = tag('avatarFull').replace(/^http:\/\//, 'https://');
   const profile = await fetchSteamProfile();
   return {
     name,
