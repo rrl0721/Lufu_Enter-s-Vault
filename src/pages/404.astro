@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="404" description="页面走丢了">
+  <section class="notfound">
+    <canvas class="notfound-fx" aria-hidden="true"></canvas>
+    <div class="notfound-inner">
+      <div class="nf-code">404</div>
+      <h1>这颗星星走丢了</h1>
+      <p>你找的页面不存在，或者已经被流星带走了。</p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn btn-primary" href="/">回到首页</a>
+        <a class="btn" href="/gallery/">看看相册</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // 星空 + 流星(404 背景)
+    function initNotFoundFx() {
+      const canvas = document.querySelector('canvas.notfound-fx') as HTMLCanvasElement | null;
+      if (!canvas || canvas.dataset.ready) return;
+      canvas.dataset.ready = '1';
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rand = (a: number, b: number) => a + Math.random() * (b - a);
+      const stars: { x: number; y: number; r: number; phase: number; speed: number }[] = [];
+      const meteors: { x: number; y: number; vx: number; vy: number; len: number; life: number; maxLife: number }[] = [];
+      let w = 0, h = 0, raf = 0, running = false, lastMeteor = 0, nextMeteor = 1200;
+
+      const resize = () => {
+        const r = canvas.getBoundingClientRect();
+        w = r.width; h = r.height;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        stars.length = 0;
+        const n = Math.min(260, Math.round((w * h) / 7000));
+        for (let i = 0; i < n; i++) {
+          stars.push({ x: rand(0, w), y: rand(0, h), r: rand(0.5, 1.6), phase: rand(0, Math.PI * 2), speed: rand(0.6, 1.8) });
+        }
+      };
+
+      const spawnMeteor = () => {
+        const rightward = Math.random() < 0.65;
+        const speed = rand(6, 11);
+        const ang = rand(0.35, 0.6);
+        meteors.push({
+          x: rightward ? rand(-120, w * 0.55) : rand(w * 0.45, w + 120),
+          y: rand(-80, h * 0.22),
+          vx: Math.cos(ang) * speed * (rightward ? 1 : -1),
+          vy: Math.sin(ang) * speed,
+          len: rand(90, 200),
+          life: 0,
+          maxLife: rand(1.1, 1.9),
+        });
+      };
+
+      const draw = (now: number) => {
+        if (!canvas.isConnected) return;
+        const t = now * 0.001;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#dce8ff';
+        for (const s of stars) {
+          ctx.globalAlpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, 6.2832);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          m.x += m.vx; m.y += m.vy; m.life += 1 / 60;
+          const fade = 1 - m.life / m.maxLife;
+          if (fade <= 0 || m.x < -320 || m.x > w + 320 || m.y > h + 320) { meteors.splice(i, 1); continue; }
+          const mag = Math.hypot(m.vx, m.vy) || 1;
+          const tx = m.x - (m.vx / mag) * m.len;
+          const ty = m.y - (m.vy / mag) * m.len;
+          const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
+          grad.addColorStop(0, `rgba(225,238,255,${(0.9 * fade).toFixed(3)})`);
+          grad.addColorStop(0.45, `rgba(150,190,255,${(0.32 * fade).toFixed(3)})`);
+          grad.addColorStop(1, 'rgba(150,190,255,0)');
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1.6;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(tx, ty);
+          ctx.stroke();
+        }
+        if (now - lastMeteor > nextMeteor) {
+          lastMeteor = now;
+          nextMeteor = rand(700, 2200);
+          spawnMeteor();
+        }
+        if (running) raf = requestAnimationFrame(draw);
+      };
+
+      const start = () => { if (!running) { running = true; raf = requestAnimationFrame(draw); } };
+      const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+      resize();
+      new ResizeObserver(resize).observe(canvas);
+      if (reduce) draw(0);
+      else new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0 }).observe(canvas);
+    }
+    document.addEventListener('astro:page-load', initNotFoundFx);
+    initNotFoundFx();
+  </script>
+</Base>

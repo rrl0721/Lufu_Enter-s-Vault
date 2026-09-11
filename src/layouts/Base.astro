@@ -4,16 +4,21 @@ import '@fontsource-variable/source-serif-4';
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
-interface Props { title?: string; description?: string; bodyClass?: string; }
-const { title = 'Lufu_Enter', description = '一个属于我的小站', bodyClass = '' } = Astro.props;
+interface Props { title?: string; description?: string; bodyClass?: string; image?: string; }
+const { title = 'Lufu_Enter', description = '一个属于我的小站', bodyClass = '', image = '' } = Astro.props;
 const site = 'Lufu_Enter';
 const pathname = Astro.url.pathname;
 const links = [
   { href: '/', label: '首页' },
+  { href: '/gallery/', label: '相册' },
   { href: '/search/', label: '搜索' },
   { href: '/about/', label: '关于' },
   { href: '/friends/', label: '友链' },
 ];
+const origin = (Astro.site || new URL('https://lufusblog.top')).origin;
+const canonical = new URL(Astro.url.pathname, origin).href;
+const ogImage = image ? new URL(image, origin).href : new URL('/og.png', origin).href;
+const ogTitle = title === site ? site : `${title} · ${site}`;
 ---
 <!doctype html>
 <html lang="zh-CN" data-theme="dark">
@@ -21,12 +26,23 @@ const links = [
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark" />
-  <title>{title === site ? title : `${title} · ${site}`}</title>
+  <title>{ogTitle}</title>
   <meta name="description" content={description} />
   <meta name="generator" content={Astro.generator} />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <link rel="alternate" type="application/rss+xml" title="Lufu_Enter" href="/rss.xml" />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={site} />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={ogTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
   <ClientRouter />
 </head>
 <body class={bodyClass}>
@@ -78,7 +94,7 @@ const links = [
       // 图片灯箱
       const lb = document.getElementById('lightbox');
       const lbImg = document.getElementById('lightboxImg') as HTMLImageElement | null;
-      document.querySelectorAll('.prose img').forEach((img) => {
+      document.querySelectorAll('.prose img, .zoomable').forEach((img) => {
         (img as HTMLImageElement).style.cursor = 'zoom-in';
         (img as HTMLImageElement).onclick = () => {
           if (!lb || !lbImg) return;

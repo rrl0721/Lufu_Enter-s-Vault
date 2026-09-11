@@ -6,16 +6,16 @@ interface Props {
   categoryId?: string;  // giscus.app 生成
 }
 const {
-  repo = 'owner/repo',
+  repo = 'rrl0721/Lufu_Enter-s-Vault',
   repoId = '',
   category = 'Announcements',
   categoryId = '',
 } = Astro.props;
 const configured = Boolean(repoId && categoryId);
 ---
-<section class="comments">
-  <div class="section-title">评论</div>
-  {configured ? (
+{configured && (
+  <section class="comments">
+    <div class="section-title">评论</div>
     <div class="giscus"></div>
     <script
       is:inline
@@ -34,11 +34,5 @@ const configured = Boolean(repoId && categoryId);
       data-loading="lazy"
       crossorigin="anonymous"
       async></script>
-  ) : (
-    <p style="color:var(--muted);font-size:14px">
-      评论区还没配置。去 <a href="https://giscus.app" target="_blank" rel="noopener">giscus.app</a>
-      生成配置，把 <code>repoId</code> / <code>categoryId</code> 填进
-      <code>src/components/Giscus.astro</code> 即可（需要仓库开启 Discussions + 装 giscus App）。
-    </p>
-  )}
-</section>
+  </section>
+)}

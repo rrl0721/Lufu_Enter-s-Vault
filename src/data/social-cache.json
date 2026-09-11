@@ -83,6 +83,24 @@
         "cover": "https://i0.hdslb.com/bfs/bangumi/image/090d4aa97754d1d80206e461eb633b28b9deed07.jpg",
         "coverLocal": "/social/bangumi-11.jpg",
         "type": "番剧"
+      },
+      {
+        "title": "邻家的天使同学",
+        "cover": "https://i0.hdslb.com/bfs/bangumi/image/50f011dc86acb0f89bfb38384f9383a68a06bd78.png",
+        "coverLocal": "/social/bangumi-12.png",
+        "type": "番剧"
+      },
+      {
+        "title": "总之就是非常可爱 第二季",
+        "cover": "https://i0.hdslb.com/bfs/bangumi/image/2f57b2255f0b8608fabdca55612d40b4249d4dcb.png",
+        "coverLocal": "/social/bangumi-13.png",
+        "type": "番剧"
+      },
+      {
+        "title": "不时用俄语小声说真心话的邻桌艾莉同学",
+        "cover": "https://i0.hdslb.com/bfs/bangumi/image/96f9aeb74c9646c318f25bba798462061bd800d7.png",
+        "coverLocal": "/social/bangumi-14.png",
+        "type": "番剧"
       }
     ],
     "bangumiTotal": 15,
@@ -121,6 +139,36 @@
             "title": "[转载授权][钢琴楽譜]Rain stops and...[オトメ＊ドメイン][耳コピー]",
             "cover": "https://i1.hdslb.com/bfs/archive/704ae017dc811e878da5551f6329febcab73fe18.jpg",
             "coverLocal": "/social/fav-0-5.jpg"
+          },
+          {
+            "title": "[转载授权][钢琴谱]Cold rain（少女领域OP）オトメ＊ドメイン",
+            "cover": "https://i0.hdslb.com/bfs/archive/810bea0e56bd117ffc110042a941690463b48fdc.jpg",
+            "coverLocal": "/social/fav-0-6.jpg"
+          },
+          {
+            "title": "〔谱〕少女领域 OP - LOVING TRIP☆转载授权☆",
+            "cover": "https://i1.hdslb.com/bfs/archive/911502bc4923d8cd5c904b14a53c306ec97eb41f.jpg",
+            "coverLocal": "/social/fav-0-7.jpg"
+          },
+          {
+            "title": "〔谱〕巧克甜恋 OP - きらめき＊Chocolaterie☆转载授权☆",
+            "cover": "https://i0.hdslb.com/bfs/archive/ab42f518e4662c7e2028ad028aa30f45ccf394d0.jpg",
+            "coverLocal": "/social/fav-0-8.jpg"
+          },
+          {
+            "title": "〔谱〕甜蜜女友3 插入歌 - 夏のゆくえ",
+            "cover": "https://i2.hdslb.com/bfs/archive/08bf18b09e9c040b1ee89275ce1d23e419be62cf.jpg",
+            "coverLocal": "/social/fav-0-9.jpg"
+          },
+          {
+            "title": "〔谱〕甜蜜女友3 插入歌 - ヒトカケラ",
+            "cover": "https://i0.hdslb.com/bfs/archive/672fdc9e283e21c1017a7f49877eba13074d4a9d.jpg",
+            "coverLocal": "/social/fav-0-10.jpg"
+          },
+          {
+            "title": "〔谱〕甜蜜女友3 OP - Q.E.D",
+            "cover": "https://i1.hdslb.com/bfs/archive/804422f221da5dd31bf30a7f5936443f8ede16dd.jpg",
+            "coverLocal": "/social/fav-0-11.jpg"
           }
         ]
       }
@@ -158,5 +206,5 @@
     "hoursTotal": 0,
     "gamesPublic": true
   },
-  "updatedAt": "2026-09-11T15:51:57.116Z"
+  "updatedAt": "2026-09-11T16:26:37.550Z"
 }

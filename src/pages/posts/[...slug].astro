@@ -4,15 +4,19 @@ import Base from '../../layouts/Base.astro';
 import Giscus from '../../components/Giscus.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = (await getCollection('posts', ({ data }) => !data.draft))
+    .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, prev: posts[i - 1] ?? null, next: posts[i + 1] ?? null },
+  }));
 }
 
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
-<Base title={post.data.title} description={post.data.summary}>
+<Base title={post.data.title} description={post.data.summary} image={post.data.cover}>
   <article class="article wrap">
     <h1 class="reveal">{post.data.title}</h1>
     <div class="meta reveal">
@@ -30,6 +34,23 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     <div class="prose reveal">
       <Content />
     </div>
+
+    <nav class="post-nav reveal">
+      {prev ? (
+        <a href={`/posts/${prev.id}/`}>
+          <span>← 上一篇</span><b>{prev.data.title}</b>
+        </a>
+      ) : (
+        <span class="empty"></span>
+      )}
+      {next ? (
+        <a class="next" href={`/posts/${next.id}/`}>
+          <span>下一篇 →</span><b>{next.data.title}</b>
+        </a>
+      ) : (
+        <span class="empty"></span>
+      )}
+    </nav>
 
     <div class="reveal" style="margin-top:48px">
       <Giscus />

@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const items = (await getCollection('gallery', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Base title="相册" description="一些带图的记录">
+  <section class="wrap gallery-page">
+    <div class="section-title">相册</div>
+    <p class="gallery-sub">一些带图的记录，慢慢攒。</p>
+
+    <div class="gallery-grid">
+      {items.map((it) => (
+        <figure class="gallery-item reveal">
+          <img class="zoomable" src={it.data.image} alt={it.data.title || it.data.note} loading="lazy" />
+          <figcaption>
+            {it.data.title && <b>{it.data.title}</b>}
+            {it.data.note && <span>{it.data.note}</span>}
+            <time>{it.data.date.toLocaleDateString('zh-CN')}</time>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    {items.length === 0 && (
+      <p style="color:var(--muted);margin-top:20px">
+        还没有照片。把图片放进 <code>public/gallery/</code>，再到 <code>src/content/gallery/</code>
+        写一条记录（frontmatter: title / date / image / note）即可。
+      </p>
+    )}
+  </section>
+</Base>

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import https from 'node:https';
-import cacheJson from '../data/social-cache.json';
+import cacheJson from '../data/social-cache.json' with { type: 'json' };
 
 const UID = '3546622048864404';
 const STEAM_ID = '76561199888306296';
@@ -153,7 +153,7 @@ async function saveImage(url: string, name: string): Promise<string> {
 async function fetchBangumi(): Promise<{ items: BangumiItem[]; total: number; isPublic: boolean }> {
   try {
     const raw = JSON.parse(
-      (await get(`https://api.bilibili.com/x/space/bangumi/follow/list?type=1&follow_status=0&vmid=${UID}&pn=1&ps=12`)).body.toString('utf8')
+      (await get(`https://api.bilibili.com/x/space/bangumi/follow/list?type=1&follow_status=0&vmid=${UID}&pn=1&ps=20`)).body.toString('utf8')
     );
     if (raw?.code !== 0 || !raw?.data?.list) return { items: [], total: 0, isPublic: false };
     const items: BangumiItem[] = [];
@@ -184,7 +184,7 @@ async function fetchFavs(): Promise<FavFolder[]> {
       const folder: FavFolder = { title: f.title || '', count: f.media_count ?? 0, items: [] };
       try {
         const res = JSON.parse(
-          (await get(`https://api.bilibili.com/x/v3/fav/resource/list?media_id=${f.id}&pn=1&ps=6&platform=web`)).body.toString('utf8')
+          (await get(`https://api.bilibili.com/x/v3/fav/resource/list?media_id=${f.id}&pn=1&ps=12&platform=web`)).body.toString('utf8')
         );
         const medias = res?.data?.medias;
         if (Array.isArray(medias)) {
