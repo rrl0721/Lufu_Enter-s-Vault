@@ -767,8 +767,8 @@ const friends = [
         };
         const proj = pts.map(project);
         // 白色细线(浅色主题下用前景色, 保证可见)
-        const light = nr + ng + nb > 382;
-        const lr = light ? nr : 255, lg = light ? ng : 255, lb = light ? nb : 255;
+        const fgIsLight = nr + ng + nb > 382; // 深色主题: 线用纯白; 浅色主题: 用前景色
+        const lr = fgIsLight ? 255 : nr, lg = fgIsLight ? 255 : ng, lb = fgIsLight ? 255 : nb;
         ctx.lineWidth = 0.7;
         for (const [i, j] of edges) {
           const a = proj[i], b = proj[j];
