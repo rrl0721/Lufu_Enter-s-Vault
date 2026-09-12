@@ -56,6 +56,15 @@ import { Send, X, EyeOff } from 'lucide-astro';
       open: false, talkUntil: 0, fx: new Map<string, number>(),
     });
 
+    // AI 对话开关(暂时关闭, 只保留看板娘; 想恢复把这里改成 true 即可)
+    const CHAT_ENABLED = false;
+    if (!CHAT_ENABLED) {
+      chat.hidden = true;
+      chat.style.display = 'none';
+      toggle.style.display = 'none';
+      document.documentElement.classList.remove('l2d-open');
+    }
+
     // ---------- 对话历史 ----------
     let history: { role: string; content: string }[] = [];
     try { history = JSON.parse(sessionStorage.getItem('l2d-history') || '[]') || []; } catch {}
@@ -77,6 +86,7 @@ import { Send, X, EyeOff } from 'lucide-astro';
 
     // ---------- 开关对话 ----------
     function setOpen(v: boolean) {
+      if (!CHAT_ENABLED) v = false;
       S.open = v;
       chat.hidden = !v;
       document.documentElement.classList.toggle('l2d-open', v);
@@ -124,17 +134,16 @@ import { Send, X, EyeOff } from 'lucide-astro';
           idleMotionGroup: 'Idle',
         });
         S.model = model;
-        // 构图: 展示头顶(猫耳)到裙摆
-        const scale = (H * 1.54) / model.height;
+        // 构图: 上半身特写(头顶猫耳/皇冠 → 腰际), 表情清晰可见
+        const scale = (H * 2.84) / model.height;
         model.scale.set(scale);
         model.anchor.set(0.5, 0.5);
-        model.position.set(W * 0.475, H * 0.8625);
+        model.position.set(W * 0.494, H * 1.175);
         S.app.stage.addChild(model);
 
         // 默认猫耳
         model.expression('猫耳');
-
-        // 口型 + 表情注入
+        // 注: 不播放 Wave 动作 —— 该模型为 VTS 面捕设计, 挥手动作会导致手掌与袖子脱节
         model.internalModel.on('beforeModelUpdate', () => {
           const core = model.internalModel.coreModel;
           const now = performance.now();
@@ -149,7 +158,6 @@ import { Send, X, EyeOff } from 'lucide-astro';
           }
         });
 
-        model.motion('Wave');
         S.ready = true;
         loading.hidden = true;
       } catch (e) {
@@ -175,6 +183,10 @@ import { Send, X, EyeOff } from 'lucide-astro';
     // ---------- 交互 ----------
     toggle.addEventListener('click', async () => {
       if (S.loading) return;
+      if (!CHAT_ENABLED) {
+        if (matchMedia('(min-width: 768px)').matches) await reveal();
+        return;
+      }
       if (matchMedia('(min-width: 768px)').matches) {
         if (await reveal()) setOpen(true);
       } else {
@@ -192,24 +204,19 @@ import { Send, X, EyeOff } from 'lucide-astro';
     $('l2d-close').addEventListener('click', () => setOpen(false));
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.open) setOpen(false); });
 
-    // 点击模型区域 → 开关对话
-    function modelBox() {
-      if (!S.model || !S.app) return null;
-      const r = canvas.getBoundingClientRect();
-      const b = S.model.getBounds();
-      const sx = r.width / S.app.screen.width;
-      const sy = r.height / S.app.screen.height;
-      return { l: r.left + b.x * sx, t: r.top + b.y * sy, r: r.left + (b.x + b.width) * sx, b: r.top + (b.y + b.height) * sy };
-    }
+    // 点击看板娘画布区域 → 开关对话(关闭时只是戳一下脸红)
     document.addEventListener('click', (e) => {
       if (!S.ready) return;
       const t = e.target as HTMLElement;
       if (t.closest && t.closest('a, button, input, textarea, select, label, video, .l2d-chat, .l2d-toggle, #tag-sphere, .lightbox')) return;
-      const box = modelBox();
-      if (!box) return;
-      if (e.clientX >= box.l && e.clientX <= box.r && e.clientY >= box.t && e.clientY <= box.b) {
-        setOpen(!S.open);
-        if (S.open) S.model.motion('Wave');
+      const r = canvas.getBoundingClientRect();
+      if (r.width && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+        if (CHAT_ENABLED) {
+          setOpen(!S.open);
+          if (S.open) S.fx.set('Param31', performance.now() + 1600); // 脸红
+        } else {
+          S.fx.set('Param31', performance.now() + 1600); // 戳一下脸红
+        }
       }
     }, true);
 
@@ -310,6 +317,7 @@ import { Send, X, EyeOff } from 'lucide-astro';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!CHAT_ENABLED) return;
       const text = input.value.trim();
       if (!text || S.sending) return;
       input.value = '';
@@ -337,6 +345,7 @@ import { Send, X, EyeOff } from 'lucide-astro';
         }
       } catch (err: any) {
         bubble.textContent = '（小冰现在不在家，等会儿再聊吧 >_<）';
+        if (S.fx) S.fx.set('Param44', performance.now() + 2200); // 流泪
         console.warn('[l2d chat]', err);
       } finally {
         S.talkUntil = 0;

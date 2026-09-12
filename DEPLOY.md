@@ -72,6 +72,9 @@ npm run preview             # 预览构建产物 http://localhost:4322
 
 ## AI 看板娘与对话（小冰）
 
+> 当前状态：**AI 对话暂时关闭**（只保留看板娘展示，点击角色只是脸红互动）。
+> 恢复方法：把 `src/components/Live2DAssistant.astro` 里的 `const CHAT_ENABLED = false` 改成 `true`；想启用公网对话还需按下面的「本地优先」链路把 llama.cpp + 隧道配好。
+
 - 前端组件：`src/components/Live2DAssistant.astro`（全站右下角，`transition:persist` 跨页保持）
 - Live2D 模型：`public/live2d/icegirl/`（IceGirl · Cubism 3；纹理已压成 WebP，全量约 4.3MB，桌面端空闲懒加载；默认表情「猫耳」）
 - 运行时：`public/live2d/live2dcubismcore.min.js` + npm 依赖 `pixi.js@6` / `pixi-live2d-display`
