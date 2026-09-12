@@ -340,30 +340,15 @@ img { max-width: 100%; border-radius: 12px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* B站页: 极浅粉主题 + 飘落樱花 */
-html:has(.bili-page) { background: #fff6f9; }
-.bili-page {
-  --bg: #fff6f9;
-  --bg-soft: #ffeef4;
-  --fg: #3d2b33;
-  --muted: #96727f;
-  --card: #ffffff;
-  --border: #f7dde7;
-  --accent: #fb7299;
-  --accent-2: #f9a8c4;
-  --shadow: 0 8px 30px rgba(251, 114, 153, .12);
-  color-scheme: light;
-}
+/* B站页: 跟随全局主题 + 飘落樱花 */
 .bili-page::before {
   content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(60% 40% at 82% 0%, rgba(251, 114, 153, .12), transparent 70%),
-    radial-gradient(50% 35% at 8% 12%, rgba(249, 168, 196, .12), transparent 70%);
+    radial-gradient(60% 40% at 82% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    radial-gradient(50% 35% at 8% 12%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 70%);
 }
 .bili-page main, .bili-page .site-footer { position: relative; z-index: 1; }
 #sakura { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-.bili-page .site-header .dock { box-shadow: 0 10px 30px rgba(251, 114, 153, .14); }
-.bili-page .profile-card.bili { background: linear-gradient(180deg, #ffffff, #fff8fb); }
 
 /* 点击/键盘聚焦: 统一圆角光晕(鼠标不显示生硬方框) */
 :where(a, button, input, textarea, select, summary, [tabindex]):focus { outline: none; }
@@ -534,10 +519,47 @@ html[data-nav="back"] ::view-transition-new(root) { animation: slide-in-left .45
   color: var(--fg); padding: 1px 6px; border-radius: 6px;
 }
 
-/* ===== 主题配色切换 ===== */
-[data-palette="sakura"] { --accent: #fb7299; --accent-2: #c08bff; }
-[data-palette="sea"] { --accent: #57cbde; --accent-2: #6ea8ff; }
-[data-palette="amber"] { --accent: #f0b35b; --accent-2: #fb7299; }
+/* ===== 主题配色切换(完整主题) ===== */
+/* 樱夜: 极浅粉 */
+[data-palette="sakura"] {
+  color-scheme: light;
+  --bg: #fff6f9;
+  --bg-soft: #ffeef4;
+  --fg: #3d2b33;
+  --muted: #96727f;
+  --card: #ffffff;
+  --border: #f7dde7;
+  --accent: #fb7299;
+  --accent-2: #c08bff;
+  --shadow: 0 8px 30px rgba(251, 114, 153, .12);
+}
+/* 碧海: 纯白 */
+[data-palette="sea"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-soft: #f3f8fb;
+  --fg: #1b2833;
+  --muted: #68798a;
+  --card: #ffffff;
+  --border: #e3ecf3;
+  --accent: #2f9fd0;
+  --accent-2: #57cbde;
+  --shadow: 0 8px 30px rgba(47, 159, 208, .10);
+}
+/* 暮光: 米黄 */
+[data-palette="amber"] {
+  color-scheme: light;
+  --bg: #faf5e9;
+  --bg-soft: #f4ecd9;
+  --fg: #3a3125;
+  --muted: #8a7c62;
+  --card: #fffdf6;
+  --border: #ebdfc6;
+  --accent: #d99a2b;
+  --accent-2: #e08a5c;
+  --shadow: 0 8px 30px rgba(180, 140, 60, .12);
+}
+html { background: var(--bg); }
 
 .palette { position: relative; margin-left: 4px; }
 .palette-btn {

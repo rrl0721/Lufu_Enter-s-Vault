@@ -77,15 +77,15 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
   </section>
 
   <script>
-    // 读取主题主色(供 Canvas 跟随配色)
-    function readAccentRGB(): [number, number, number] {
-      const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    // 读取主题变量颜色(供 Canvas 跟随配色)
+    function readVarRGB(name: string, fallback: [number, number, number]): [number, number, number] {
+      const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
       const m = /^#?([0-9a-f]{6})$/i.exec(v);
       if (m) {
         const n = parseInt(m[1], 16);
         return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
       }
-      return [110, 168, 255];
+      return fallback;
     }
 
     // 背景: 俯视海浪点阵(Canvas, 低开销)
@@ -101,15 +101,16 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       const GAP = 22;
       // 波谷→波峰: 灰蓝(有但不发光) → 高亮高饱和蓝
       const BUCKETS = 7;
-      let [ar, ag, ab] = readAccentRGB();
+      let [ar, ag, ab] = readVarRGB('--accent', [110, 168, 255]);
+      let [nr, ng, nb] = readVarRGB('--fg', [232, 233, 236]);
       let colors: string[] = [];
       let HALO = '';
       const buildColors = () => {
         colors = Array.from({ length: BUCKETS }, (_, k) => {
           const v = k / (BUCKETS - 1);
-          const r = Math.round(145 + (ar - 145) * v);
-          const g = Math.round(152 + (ag - 152) * v);
-          const b = Math.round(165 + (ab - 165) * v);
+          const r = Math.round(nr + (ar - nr) * v);
+          const g = Math.round(ng + (ag - ng) * v);
+          const b = Math.round(nb + (ab - nb) * v);
           const a = 0.1 + 0.85 * Math.pow(v, 1.6);
           return `rgba(${r},${g},${b},${a.toFixed(3)})`;
         });
@@ -117,7 +118,8 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       };
       buildColors();
       document.addEventListener('palettechange', () => {
-        [ar, ag, ab] = readAccentRGB();
+        [ar, ag, ab] = readVarRGB('--accent', [110, 168, 255]);
+        [nr, ng, nb] = readVarRGB('--fg', [232, 233, 236]);
         buildColors();
       });
       const TRAIL_MS = 280, R_TRAIL = 42, RIPPLE_MS = 1500, R_BAND = 34;
@@ -348,8 +350,12 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       const rand = (a: number, b: number) => a + Math.random() * (b - a);
       const stars: { x: number; y: number; r: number; phase: number; speed: number }[] = [];
       const meteors: { x: number; y: number; vx: number; vy: number; len: number; life: number; maxLife: number }[] = [];
-      let [mr, mg, mb] = readAccentRGB();
-      document.addEventListener('palettechange', () => { [mr, mg, mb] = readAccentRGB(); });
+      let [mr, mg, mb] = readVarRGB('--accent', [110, 168, 255]);
+      let [sr, sg, sb] = readVarRGB('--fg', [232, 233, 236]);
+      document.addEventListener('palettechange', () => {
+        [mr, mg, mb] = readVarRGB('--accent', [110, 168, 255]);
+        [sr, sg, sb] = readVarRGB('--fg', [232, 233, 236]);
+      });
       let w = 0, h = 0, raf = 0, running = false, lastMeteor = 0, nextMeteor = 1200;
 
       const resize = () => {
@@ -386,7 +392,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
         ctx.clearRect(0, 0, w, h);
 
         // 星星闪烁
-        ctx.fillStyle = '#dce8ff';
+        ctx.fillStyle = `rgb(${sr},${sg},${sb})`;
         for (const s of stars) {
           const tw = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
           ctx.globalAlpha = tw;
@@ -411,7 +417,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
           const tx = m.x - (m.vx / mag) * m.len;
           const ty = m.y - (m.vy / mag) * m.len;
           const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
-          grad.addColorStop(0, `rgba(235,244,255,${(0.9 * fade).toFixed(3)})`);
+          grad.addColorStop(0, `rgba(${sr},${sg},${sb},${(0.9 * fade).toFixed(3)})`);
           grad.addColorStop(0.45, `rgba(${mr},${mg},${mb},${(0.36 * fade).toFixed(3)})`);
           grad.addColorStop(1, `rgba(${mr},${mg},${mb},0)`);
           ctx.strokeStyle = grad;

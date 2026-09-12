@@ -29,17 +29,21 @@ import Base from '../layouts/Base.astro';
       const rand = (a: number, b: number) => a + Math.random() * (b - a);
       const stars: { x: number; y: number; r: number; phase: number; speed: number }[] = [];
       const meteors: { x: number; y: number; vx: number; vy: number; len: number; life: number; maxLife: number }[] = [];
-      const readAccent = (): [number, number, number] => {
-        const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const readVar = (name: string, fb: [number, number, number]): [number, number, number] => {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
         const m = /^#?([0-9a-f]{6})$/i.exec(v);
         if (m) {
           const n = parseInt(m[1], 16);
           return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
         }
-        return [110, 168, 255];
+        return fb;
       };
-      let [mr, mg, mb] = readAccent();
-      document.addEventListener('palettechange', () => { [mr, mg, mb] = readAccent(); });
+      let [mr, mg, mb] = readVar('--accent', [110, 168, 255]);
+      let [sr, sg, sb] = readVar('--fg', [232, 233, 236]);
+      document.addEventListener('palettechange', () => {
+        [mr, mg, mb] = readVar('--accent', [110, 168, 255]);
+        [sr, sg, sb] = readVar('--fg', [232, 233, 236]);
+      });
       let w = 0, h = 0, raf = 0, running = false, lastMeteor = 0, nextMeteor = 1200;
 
       const resize = () => {
@@ -74,7 +78,7 @@ import Base from '../layouts/Base.astro';
         if (!canvas.isConnected) return;
         const t = now * 0.001;
         ctx.clearRect(0, 0, w, h);
-        ctx.fillStyle = '#dce8ff';
+        ctx.fillStyle = `rgb(${sr},${sg},${sb})`;
         for (const s of stars) {
           ctx.globalAlpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
           ctx.beginPath();
@@ -91,7 +95,7 @@ import Base from '../layouts/Base.astro';
           const tx = m.x - (m.vx / mag) * m.len;
           const ty = m.y - (m.vy / mag) * m.len;
           const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
-          grad.addColorStop(0, `rgba(235,244,255,${(0.9 * fade).toFixed(3)})`);
+          grad.addColorStop(0, `rgba(${sr},${sg},${sb},${(0.9 * fade).toFixed(3)})`);
           grad.addColorStop(0.45, `rgba(${mr},${mg},${mb},${(0.36 * fade).toFixed(3)})`);
           grad.addColorStop(1, `rgba(${mr},${mg},${mb},0)`);
           ctx.strokeStyle = grad;

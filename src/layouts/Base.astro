@@ -77,8 +77,8 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
         <div class="palette-menu" id="paletteMenu">
           <button data-palette="deep"><i style="--c:#6ea8ff"></i>深海夜</button>
           <button data-palette="sakura"><i style="--c:#fb7299"></i>樱夜</button>
-          <button data-palette="sea"><i style="--c:#57cbde"></i>碧海</button>
-          <button data-palette="amber"><i style="--c:#f0b35b"></i>暮金</button>
+          <button data-palette="sea"><i style="--c:#2f9fd0"></i>碧海</button>
+          <button data-palette="amber"><i style="--c:#d99a2b"></i>暮光</button>
         </div>
       </div>
     </div>
@@ -246,6 +246,16 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
     document.addEventListener('astro:page-load', init);
     if (document.readyState !== 'loading') init();
     else document.addEventListener('DOMContentLoaded', init);
+
+    // 防切换页面回退: 每次导航后重新应用已保存的主题
+    const applyPalette = () => {
+      try {
+        const p = localStorage.getItem('palette');
+        if (p) document.documentElement.setAttribute('data-palette', p);
+      } catch {}
+    };
+    document.addEventListener('astro:after-swap', applyPalette);
+    document.addEventListener('astro:page-load', applyPalette);
 
     // 导航加载条
     document.addEventListener('astro:before-preparation', () => {
