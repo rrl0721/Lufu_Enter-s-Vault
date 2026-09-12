@@ -261,6 +261,74 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
         }
       }
 
+      // 自定义光标: 首次真实鼠标移动时启用(触屏/减少动效自动跳过)
+      if (!w.__cursorFx) {
+        w.__cursorFx = true;
+        const startCursor = () => {
+          if (document.querySelector('.cursor-dot')) return;
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          const dot = document.createElement('div');
+          dot.className = 'cursor-dot';
+          const ring = document.createElement('div');
+          ring.className = 'cursor-ring';
+          document.body.append(dot, ring);
+          document.documentElement.classList.add('has-cursor-fx');
+          let mx = -100, my = -100, rx2 = -100, ry2 = -100;
+          addEventListener('pointermove', (e) => {
+            mx = e.clientX; my = e.clientY;
+            dot.style.transform = `translate(${mx}px, ${my}px)`;
+          }, { passive: true });
+          const follow = () => {
+            rx2 += (mx - rx2) * 0.16;
+            ry2 += (my - ry2) * 0.16;
+            ring.style.transform = `translate(${rx2}px, ${ry2}px)`;
+            requestAnimationFrame(follow);
+          };
+          requestAnimationFrame(follow);
+          document.addEventListener('pointerover', (e) => {
+            const t = e.target as HTMLElement;
+            const it = t.closest && t.closest('a, button, input, textarea, canvas, .post-card, .friend-card, .gallery-item');
+            ring.classList.toggle('hover', !!it);
+          });
+          addEventListener('pointerdown', () => ring.classList.add('down'));
+          addEventListener('pointerup', () => ring.classList.remove('down'));
+          document.addEventListener('mouseleave', () => { dot.style.opacity = '0'; ring.style.opacity = '0'; });
+          document.addEventListener('mouseenter', () => { dot.style.opacity = '1'; ring.style.opacity = '1'; });
+        };
+        addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') startCursor(); }, { passive: true });
+      }
+
+      // 标题 SVG 描边动画
+      if (!w.__drawLines) {
+        w.__drawLines = true;
+        const io2 = new IntersectionObserver((es) => {
+          for (const e of es) {
+            if (e.isIntersecting) { e.target.classList.add('drawn'); io2.unobserve(e.target); }
+          }
+        }, { threshold: 0.5 });
+        const injectLines = () => {
+          document.querySelectorAll('.sub-title:not([data-dl]), .section-title:not([data-dl])').forEach((el) => {
+            (el as HTMLElement).dataset.dl = '1';
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'draw-line');
+            svg.setAttribute('viewBox', '0 0 120 8');
+            svg.setAttribute('preserveAspectRatio', 'none');
+            svg.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M2 5 Q 20 1, 40 5 T 78 5 T 118 4');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', 'currentColor');
+            path.setAttribute('stroke-width', '2');
+            path.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(path);
+            el.insertAdjacentElement('afterend', svg);
+            io2.observe(svg);
+          });
+        };
+        document.addEventListener('astro:page-load', injectLines);
+        injectLines();
+      }
+
       // 翻页方向感知(按路径层级)
       if (!w.__navDir) {
         w.__navDir = true;
