@@ -1,23 +1,26 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import { getSocial } from '../lib/social';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const galleryItems = (await getCollection('gallery', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const { bilibili, steam } = await getSocial();
+const steamState: Record<string, string> = {
+  online: '在线', offline: '离线', 'in-game': '游戏中', away: '离开', snooze: '打盹', busy: '忙碌',
+};
+const friends = [
+  { name: '示例朋友 A', url: 'https://example.com', desc: '写点技术' },
+  { name: '示例朋友 B', url: 'https://example.org', desc: '生活与摄影' },
+];
 ---
 <Base>
-  <section class="hero" data-slide>
+  {/* ===== 封面 ===== */}
+  <section class="hero" id="hero" data-slide>
     <canvas class="hero-dots" aria-hidden="true"></canvas>
-    <img
-      class="hero-bg"
-      src="/hero-art.webp"
-      alt=""
-      aria-hidden="true"
-      width="1000"
-      height="1000"
-      loading="eager"
-      fetchpriority="high"
-    />
+    <img class="hero-bg" src="/hero-art.webp" alt="" aria-hidden="true" width="1000" height="1000" loading="eager" fetchpriority="high" />
     <div class="hero-inner">
       <div class="hero-status"><span class="pulse"></span>正在折腾 Astro</div>
       <h1 aria-label="你好，我是Lufu_Enter。">
@@ -31,8 +34,8 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
         <span class="type" data-text="这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。">这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。</span>
       </p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#posts">阅读文章</a>
-        <a class="btn" href="/about/">关于我</a>
+        <a class="btn btn-primary" href="#posts" data-anchor>阅读文章</a>
+        <a class="btn" href="#about" data-anchor>关于我</a>
       </div>
       <div class="hero-social">
         <a class="social-btn" href="https://github.com/rrl0721" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub · rrl0721">
@@ -49,29 +52,155 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
         </a>
       </div>
     </div>
-    <a class="hero-scroll" href="#posts" aria-label="向下滚动">
-      <span></span>
-    </a>
+    <a class="hero-scroll" href="#about" data-anchor aria-label="向下滚动"><span></span></a>
   </section>
 
-  <section id="posts" class="posts" data-slide>
+  {/* ===== 关于(3 个磁性子页) ===== */}
+  <section class="page-section" id="about">
+    <div class="page-grid">
+      <aside class="page-outline">
+        <div class="po-title">关于</div>
+        <a href="#about-me" data-anchor>关于我</a>
+        <a href="#about-home" data-anchor>我的主页</a>
+        <a href="#about-contact" data-anchor>关于本站</a>
+      </aside>
+      <div class="page-body">
+        <div class="sub-slide" id="about-me" data-slide>
+          <h2 class="sub-title">关于我</h2>
+          <div class="prose">
+            <p>你好，我是 <strong>Lufu</strong>。这里是我的个人小站。</p>
+            <p>平时喜欢折腾 Linux、写点小工具、看看书和电影。这个站用来放一些不适合发在别处的东西。</p>
+          </div>
+        </div>
+        <div class="sub-slide" id="about-home" data-slide>
+          <h2 class="sub-title">我的主页</h2>
+          <div class="home-links">
+            <a class="home-link bili" href="/about/bilibili/">
+              <span class="hl-title">哔哩哔哩</span>
+              <span class="hl-sub">{bilibili.name} · 粉丝 {bilibili.fans}</span>
+            </a>
+            <a class="home-link steam" href="/about/steam/">
+              <span class="hl-title">Steam</span>
+              <span class="hl-sub">{steam.name} · {steamState[steam.state] || steam.state}</span>
+            </a>
+          </div>
+        </div>
+        <div class="sub-slide" id="about-contact" data-slide>
+          <h2 class="sub-title">关于本站</h2>
+          <div class="prose">
+            <ul>
+              <li>用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 搭建</li>
+              <li>托管在 <a href="https://pages.cloudflare.com" target="_blank" rel="noopener">Cloudflare</a></li>
+              <li>源码在 <a href="https://github.com/rrl0721" target="_blank" rel="noopener">GitHub</a></li>
+            </ul>
+            <h3>联系我</h3>
+            <ul>
+              <li>邮箱：<a href="mailto:1510518297@qq.com">1510518297@qq.com</a> / <a href="mailto:lzr20071130@outlook.com">lzr20071130@outlook.com</a></li>
+              <li>GitHub：<a href="https://github.com/rrl0721" target="_blank" rel="noopener">rrl0721</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== 搜索 ===== */}
+  <section class="page-section" id="search">
+    <div class="page-grid">
+      <aside class="page-outline">
+        <div class="po-title">搜索</div>
+        <a href="#search-slide" data-anchor>全文搜索</a>
+      </aside>
+      <div class="page-body">
+        <div class="sub-slide" id="search-slide" data-slide>
+          <h2 class="sub-title">搜索</h2>
+          <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+          <div id="search-ui"></div>
+          <script is:inline src="/pagefind/pagefind-ui.js"></script>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== 相册 ===== */}
+  <section class="page-section" id="gallery">
+    <div class="page-grid">
+      <aside class="page-outline">
+        <div class="po-title">相册</div>
+        <a href="#gallery-slide" data-anchor>带图记录</a>
+      </aside>
+      <div class="page-body">
+        <div class="sub-slide" id="gallery-slide" data-slide>
+          <h2 class="sub-title">相册</h2>
+          <div class="gallery-grid">
+            {galleryItems.map((it, i) => (
+              <figure class="gallery-item reveal" style={`--rd:${i * 70}ms`}>
+                <img class="zoomable" src={it.data.image} alt={it.data.title || it.data.note} loading="lazy" />
+                <figcaption>
+                  {it.data.title && <b>{it.data.title}</b>}
+                  {it.data.note && <span>{it.data.note}</span>}
+                  <time>{it.data.date.toLocaleDateString('zh-CN')}</time>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== 文章 ===== */}
+  <section id="posts" class="posts page-section">
     <canvas class="posts-fx" aria-hidden="true"></canvas>
-    <div class="wrap posts-inner">
-      <div class="section-title title-anim">最新文章</div>
-      <div class="post-list">
-        {posts.map((p, i) => (
-          <a class="post-card reveal" style={`--rd:${i * 70}ms`} href={`/posts/${p.id}/`}>
-            <h3>{p.data.title}</h3>
-            <div class="meta">{p.data.date.toLocaleDateString('zh-CN')}</div>
-            {p.data.summary && <div class="summary">{p.data.summary}</div>}
-            {p.data.tags.length > 0 && (
-              <div class="tags">
-                {p.data.tags.map((t) => <span class="tag">{t}</span>)}
-              </div>
-            )}
-          </a>
-        ))}
-        {posts.length === 0 && <p style="color:var(--muted)">还没有文章，去 <code>src/content/posts/</code> 写一篇吧。</p>}
+    <div class="page-grid">
+      <aside class="page-outline">
+        <div class="po-title">文章</div>
+        <a href="#posts-slide" data-anchor>最新文章</a>
+      </aside>
+      <div class="page-body">
+        <div class="sub-slide" id="posts-slide" data-slide>
+          <div class="section-title title-anim">最新文章</div>
+          <div class="post-list">
+            {posts.map((p, i) => (
+              <a class="post-card reveal" style={`--rd:${i * 70}ms`} href={`/posts/${p.id}/`}>
+                <h3>{p.data.title}</h3>
+                <div class="meta">{p.data.date.toLocaleDateString('zh-CN')}</div>
+                {p.data.summary && <div class="summary">{p.data.summary}</div>}
+                {p.data.tags.length > 0 && (
+                  <div class="tags">
+                    {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+                  </div>
+                )}
+              </a>
+            ))}
+            {posts.length === 0 && <p style="color:var(--muted)">还没有文章，去 <code>src/content/posts/</code> 写一篇吧。</p>}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===== 友链 ===== */}
+  <section class="page-section" id="friends">
+    <div class="page-grid">
+      <aside class="page-outline">
+        <div class="po-title">友链</div>
+        <a href="#friends-slide" data-anchor>朋友们</a>
+      </aside>
+      <div class="page-body">
+        <div class="sub-slide" id="friends-slide" data-slide>
+          <h2 class="sub-title">友链</h2>
+          <p style="color:var(--muted)">一些朋友的小站，欢迎去看看。</p>
+          <div class="friends reveal">
+            {friends.map((f) => (
+              <a class="friend" href={f.url} target="_blank" rel="noopener">
+                <span class="avatar"></span>
+                <span>{f.name}</span>
+              </a>
+            ))}
+          </div>
+          <p style="color:var(--muted);margin-top:24px;font-size:14px">想交换友链？在文章下留言，或邮件联系我。</p>
+        </div>
       </div>
     </div>
   </section>
@@ -493,6 +622,59 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     document.addEventListener('astro:page-load', initType);
     initType();
 
+    // 搜索(Pagefind UI, 构建后可用)
+    function initSearch() {
+      const el = document.getElementById('search-ui');
+      if (!el || el.dataset.init) return;
+      if ((window as any).PagefindUI) {
+        el.dataset.init = '1';
+        new (window as any).PagefindUI({
+          element: '#search-ui',
+          showSubResults: true,
+          translations: { placeholder: '搜索文章…', zero_results: '没有找到「[SEARCH_TERM]」' },
+        });
+      } else if (!el.innerHTML.trim()) {
+        el.innerHTML = '<p style="color:var(--muted)">搜索索引在<b>构建后</b>生成：跑 <code>npm run build</code> 再 <code>npm run preview</code> 即可用（dev 模式没有索引）。</p>';
+      }
+    }
+    document.addEventListener('astro:page-load', initSearch);
+    initSearch();
+
+    // 顶栏 + 左侧目录: 高亮当前区块/子页
+    function initSpy() {
+      if (!document.getElementById('hero')) return;
+      const headerH = () => {
+        const h = document.querySelector('.site-header') as HTMLElement | null;
+        return h ? h.offsetHeight : 64;
+      };
+      const sectionIds = ['hero', 'about', 'search', 'gallery', 'posts', 'friends'];
+      const onScroll = () => {
+        const y = window.scrollY + headerH() + 28;
+        let sec = 'hero';
+        for (const id of sectionIds) {
+          const el = document.getElementById(id);
+          if (el && el.getBoundingClientRect().top + window.scrollY <= y) sec = id;
+        }
+        document.querySelectorAll('.nav a[data-anchor]').forEach((a) => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + sec);
+        });
+        let cur: HTMLElement | null = null;
+        for (const el of Array.from(document.querySelectorAll('[data-slide]')) as HTMLElement[]) {
+          if (el.getBoundingClientRect().top + window.scrollY <= y) cur = el;
+        }
+        document.querySelectorAll('.page-outline a').forEach((a) => {
+          a.classList.toggle('active', !!cur && a.getAttribute('href') === '#' + cur.id);
+        });
+      };
+      const w2 = window as any;
+      if (w2.__spyScroll) removeEventListener('scroll', w2.__spyScroll);
+      w2.__spyScroll = onScroll;
+      addEventListener('scroll', w2.__spyScroll, { passive: true });
+      onScroll();
+    }
+    document.addEventListener('astro:page-load', initSpy);
+    initSpy();
+
     // 首页磁性翻页: 在所有 [data-slide] 区块之间翻页(滚轮 + 顶栏锚点)
     if (!(window as any).__pptWheel) {
       (window as any).__pptWheel = true;
@@ -515,20 +697,27 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
         'wheel',
         (e) => {
           if (lock || !document.querySelector('[data-slide]')) return;
-          const tops = slideTops();
-          if (!tops.length) return;
+          const els = Array.from(document.querySelectorAll('[data-slide]')) as HTMLElement[];
+          if (!els.length) return;
+          const hh = headerH();
           const y = window.scrollY;
+          const tops = els.map((el) => Math.max(0, Math.round(el.getBoundingClientRect().top + y - hh)));
+          let idx = 0;
+          for (let i = 0; i < els.length; i++) if (tops[i] <= y + 8) idx = i;
+          const cur = els[idx];
+          const curTop = tops[idx];
+          const curBottom = cur.getBoundingClientRect().bottom + y;
           if (e.deltaY > 0) {
-            const next = tops.find((t) => t > y + 10);
-            if (next !== undefined) {
+            const nextTop = tops[idx + 1];
+            if (nextTop !== undefined && y + window.innerHeight >= curBottom - 8) {
               e.preventDefault();
-              goto(next);
+              goto(nextTop);
             }
           } else if (e.deltaY < 0) {
-            const prev = [...tops].reverse().find((t) => t < y - 10);
-            if (prev !== undefined) {
+            const prevTop = tops[idx - 1];
+            if (prevTop !== undefined && y <= curTop + 8) {
               e.preventDefault();
-              goto(prev);
+              goto(prevTop);
             }
           }
         },
