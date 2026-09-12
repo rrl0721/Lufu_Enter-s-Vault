@@ -27,10 +27,10 @@ const avatar = bilibili.avatarLocal || bilibili.avatar;
         </div>
       </div>
       <div class="stats-grid">
-        <div class="stat-box"><b>{bilibili.fans}</b><span>粉丝</span></div>
-        <div class="stat-box"><b>{bilibili.following}</b><span>关注</span></div>
-        <div class="stat-box"><b>{bilibili.videos}</b><span>投稿</span></div>
-        <div class="stat-box"><b>{bilibili.likes}</b><span>获赞</span></div>
+        <div class="stat-box"><b data-count={String(bilibili.fans)}>{bilibili.fans}</b><span>粉丝</span></div>
+        <div class="stat-box"><b data-count={String(bilibili.following)}>{bilibili.following}</b><span>关注</span></div>
+        <div class="stat-box"><b data-count={String(bilibili.videos)}>{bilibili.videos}</b><span>投稿</span></div>
+        <div class="stat-box"><b data-count={String(bilibili.likes)}>{bilibili.likes}</b><span>获赞</span></div>
       </div>
     </div>
 

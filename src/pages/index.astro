@@ -20,8 +20,16 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     />
     <div class="hero-inner">
       <div class="hero-status"><span class="pulse"></span>正在折腾 Astro</div>
-      <h1>你好，我是<span class="grad">Lufu_Enter</span>。</h1>
-      <p>这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。</p>
+      <h1 aria-label="你好，我是Lufu_Enter。">
+        {[...'你好，我是'].map((c, i) => (
+          <span class="ch" style={`--d:${(0.18 + i * 0.05).toFixed(2)}s`}>{c}</span>
+        ))}
+        <span class="grad ch-block" style="--d:.48s">Lufu_Enter</span>
+        <span class="ch" style="--d:.72s">。</span>
+      </h1>
+      <p aria-label="这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。">
+        <span class="type" data-text="这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。">这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。</span>
+      </p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#posts">阅读文章</a>
         <a class="btn" href="/about/">关于我</a>
@@ -49,10 +57,10 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
   <section id="posts" class="posts">
     <canvas class="posts-fx" aria-hidden="true"></canvas>
     <div class="wrap posts-inner">
-      <div class="section-title">最新文章</div>
+      <div class="section-title title-anim">最新文章</div>
       <div class="post-list">
-        {posts.map((p) => (
-          <a class="post-card reveal" href={`/posts/${p.id}/`}>
+        {posts.map((p, i) => (
+          <a class="post-card reveal" style={`--rd:${i * 70}ms`} href={`/posts/${p.id}/`}>
             <h3>{p.data.title}</h3>
             <div class="meta">{p.data.date.toLocaleDateString('zh-CN')}</div>
             {p.data.summary && <div class="summary">{p.data.summary}</div>}
@@ -431,6 +439,30 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     }
     document.addEventListener('astro:page-load', initPostsFx);
     initPostsFx();
+
+    // 首屏简介打字机
+    function initType() {
+      const el = document.querySelector('.hero p .type') as HTMLElement | null;
+      if (!el || el.dataset.done) return;
+      el.dataset.done = '1';
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const text = el.dataset.text || el.textContent || '';
+      const p = el.closest('p');
+      el.textContent = '';
+      if (p) p.classList.add('typing');
+      let i = 0;
+      setTimeout(() => {
+        const timer = setInterval(() => {
+          el.textContent = text.slice(0, ++i);
+          if (i >= text.length) {
+            clearInterval(timer);
+            setTimeout(() => p?.classList.remove('typing'), 700);
+          }
+        }, 45);
+      }, 850);
+    }
+    document.addEventListener('astro:page-load', initType);
+    initType();
 
     // 首屏封面 → 最新文章: 滚轮磁性翻页 + 锚点按钮(仅首页生效)
     if (!(window as any).__pptWheel) {

@@ -7,12 +7,12 @@ const items = (await getCollection('gallery', ({ data }) => !data.draft))
 ---
 <Base title="相册" description="一些带图的记录">
   <section class="wrap gallery-page">
-    <div class="section-title">相册</div>
+    <div class="section-title title-anim">相册</div>
     <p class="gallery-sub">一些带图的记录，慢慢攒。</p>
 
     <div class="gallery-grid">
-      {items.map((it) => (
-        <figure class="gallery-item reveal">
+      {items.map((it, i) => (
+        <figure class="gallery-item reveal" style={`--rd:${i * 70}ms`}>
           <img class="zoomable" src={it.data.image} alt={it.data.title || it.data.note} loading="lazy" />
           <figcaption>
             {it.data.title && <b>{it.data.title}</b>}

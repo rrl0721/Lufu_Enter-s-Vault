@@ -46,6 +46,9 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
   <ClientRouter />
 </head>
 <body class={bodyClass}>
+  <div class="load-bar" id="loadBar" aria-hidden="true"></div>
+  {pathname.startsWith('/posts/') && <div class="read-progress" id="readProgress" aria-hidden="true"></div>}
+
   <header class="site-header">
     <div class="wrap dock">
       <a class="brand" href="/">{site}<span class="dot">.</span></a>
@@ -77,18 +80,32 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
   </div>
 
   <script>
+    const w = window as any;
+
     function init() {
-      // 滚动出现动画
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // 滚动出现动画(含标题展开)
       const io = new IntersectionObserver((es) => {
         for (const e of es) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
       }, { threshold: 0.12 });
-      document.querySelectorAll('.reveal:not(.in)').forEach((el) => io.observe(el));
+      document.querySelectorAll('.reveal:not(.in), .title-anim:not(.in)').forEach((el) => io.observe(el));
 
-      // 回到顶部
+      // 回到顶部 + 阅读进度
       const top = document.getElementById('toTop');
-      const onScroll = () => { if (top) top.classList.toggle('show', scrollY > 420); };
+      const bar = document.getElementById('readProgress');
+      const onScroll = () => {
+        if (top) top.classList.toggle('show', scrollY > 420);
+        if (bar) {
+          const h = document.documentElement;
+          const max = h.scrollHeight - h.clientHeight;
+          bar.style.transform = `scaleX(${max > 0 ? Math.min(1, h.scrollTop / max) : 0})`;
+        }
+      };
+      if (w.__onScroll) removeEventListener('scroll', w.__onScroll);
+      w.__onScroll = onScroll;
+      addEventListener('scroll', w.__onScroll, { passive: true });
       onScroll();
-      addEventListener('scroll', onScroll, { passive: true });
       if (top) top.onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
 
       // 图片灯箱
@@ -105,13 +122,105 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
       });
       const close = () => { if (lb) lb.classList.remove('show'); document.body.style.overflow = ''; };
       if (lb) lb.onclick = close;
-      addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+      if (w.__onKey) removeEventListener('keydown', w.__onKey);
+      w.__onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+      addEventListener('keydown', w.__onKey);
+
+      // 统计数字滚动
+      const counters = document.querySelectorAll('[data-count]');
+      if (counters.length && !reduce) {
+        if (w.__counterIO) w.__counterIO.disconnect();
+        const cio = new IntersectionObserver((es) => {
+          for (const e of es) {
+            if (!e.isIntersecting) continue;
+            const el = e.target as HTMLElement;
+            cio.unobserve(el);
+            const raw = el.dataset.count || '0';
+            const target = Number(raw);
+            const decimals = raw.includes('.') ? 1 : 0;
+            const t0 = performance.now();
+            const step = (now: number) => {
+              const p = Math.min(1, (now - t0) / 900);
+              el.textContent = (target * (1 - Math.pow(1 - p, 3))).toFixed(decimals);
+              if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          }
+        }, { threshold: 0.4 });
+        counters.forEach((c) => cio.observe(c));
+        w.__counterIO = cio;
+      }
+
+      // 卡片光斑 + 3D 倾斜(全局委托, 只绑一次)
+      if (!reduce && !w.__pointerFx) {
+        w.__pointerFx = true;
+        document.addEventListener('pointermove', (e) => {
+          const t = e.target as HTMLElement;
+          if (!t.closest) return;
+          const spot = t.closest('.post-card, .profile-card, .gallery-item') as HTMLElement | null;
+          if (spot) {
+            const r = spot.getBoundingClientRect();
+            spot.style.setProperty('--mx', `${e.clientX - r.left}px`);
+            spot.style.setProperty('--my', `${e.clientY - r.top}px`);
+          }
+          const tilt = t.closest('.profile-card') as HTMLElement | null;
+          if (tilt) {
+            const r = tilt.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5;
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            tilt.style.setProperty('--ry', `${(px * 7).toFixed(2)}deg`);
+            tilt.style.setProperty('--rx', `${(-py * 7).toFixed(2)}deg`);
+          }
+        });
+        document.addEventListener('pointerout', (e) => {
+          const t = e.target as HTMLElement;
+          const tilt = t.closest?.('.profile-card') as HTMLElement | null;
+          if (tilt && !tilt.contains(e.relatedTarget as Node)) {
+            tilt.style.setProperty('--rx', '0deg');
+            tilt.style.setProperty('--ry', '0deg');
+          }
+        });
+      }
+
+      // 翻页方向感知(按路径层级)
+      if (!w.__navDir) {
+        w.__navDir = true;
+        document.addEventListener('click', (e) => {
+          const a = (e.target as HTMLElement)?.closest?.('a[href^="/"]') as HTMLAnchorElement | null;
+          if (!a) return;
+          const seg = (p: string) => p.split('/').filter(Boolean).length;
+          document.documentElement.dataset.nav =
+            seg(a.getAttribute('href') || '/') < seg(location.pathname) ? 'back' : 'forward';
+        }, true);
+      }
     }
 
     document.addEventListener('astro:page-load', init);
-    // 无 ClientRouter 时兜底
     if (document.readyState !== 'loading') init();
     else document.addEventListener('DOMContentLoaded', init);
+
+    // 导航加载条
+    document.addEventListener('astro:before-preparation', () => {
+      const lb = document.getElementById('loadBar');
+      if (!lb) return;
+      lb.style.transition = 'none';
+      lb.style.opacity = '1';
+      lb.style.transform = 'scaleX(.12)';
+      requestAnimationFrame(() => {
+        lb.style.transition = 'transform 1.4s cubic-bezier(.1,.6,.2,1)';
+        lb.style.transform = 'scaleX(.85)';
+      });
+    });
+    document.addEventListener('astro:page-load', () => {
+      const lb = document.getElementById('loadBar');
+      if (!lb) return;
+      lb.style.transition = 'transform .2s ease, opacity .3s ease .15s';
+      lb.style.transform = 'scaleX(1)';
+      setTimeout(() => {
+        lb.style.opacity = '0';
+        lb.style.transform = 'scaleX(0)';
+      }, 220);
+    });
   </script>
 </body>
 </html>

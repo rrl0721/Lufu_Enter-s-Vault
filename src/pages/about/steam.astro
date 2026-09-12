@@ -31,9 +31,9 @@ const stateLabel = stateMap[steam.state] || steam.state;
         </div>
       </div>
       <div class="stats-grid">
-        <div class="stat-box"><b>{steam.gamesTotal || '—'}</b><span>游戏数</span></div>
-        <div class="stat-box"><b>{steam.hours2wk || '0'}</b><span>最近两周(h)</span></div>
-        <div class="stat-box"><b>{steam.games.length || '—'}</b><span>最近游戏</span></div>
+        <div class="stat-box"><b data-count={String(steam.gamesTotal)}>{steam.gamesTotal}</b><span>游戏数</span></div>
+        <div class="stat-box"><b data-count={steam.hours2wk || '0'}>{steam.hours2wk || '0'}</b><span>最近两周(h)</span></div>
+        <div class="stat-box"><b data-count={String(steam.games.length)}>{steam.games.length}</b><span>最近游戏</span></div>
         <div class="stat-box"><b>{steam.vacBanned ? '有' : '无'}</b><span>VAC 封禁</span></div>
       </div>
       <div class="profile-meta">
