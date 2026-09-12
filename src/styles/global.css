@@ -705,6 +705,19 @@ html { background: var(--bg); }
 .pm-item.bday span { color: #fb7299; }
 .pm-item b { font-size: 14px; font-weight: 600; }
 
+/* 标签星系 + 图标微调 */
+.sub-title { display: flex; align-items: center; gap: 10px; }
+.sub-title svg { color: var(--accent); flex: none; }
+.sphere-hint { color: var(--muted); font-size: 13.5px; margin: 2px 0 6px; }
+.tag-sphere-wrap { width: min(520px, 78vw); aspect-ratio: 1; margin-top: 6px; }
+#tag-sphere { width: 100%; height: 100%; cursor: grab; touch-action: none; display: block; }
+#tag-sphere:active { cursor: grabbing; }
+.btn svg { flex: none; }
+.meta { display: inline-flex; align-items: center; gap: 6px; }
+.friend svg { color: var(--accent); flex: none; }
+.to-top svg { display: block; }
+.palette-btn { color: var(--accent); }
+
 /* 滚动出现动画 */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
 .reveal.in { opacity: 1; transform: none; }

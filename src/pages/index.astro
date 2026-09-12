@@ -1,7 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
+import {
+  BookOpen, User, Link2, Info, Search, Image as ImageIcon, Newspaper, Heart, CalendarDays, Sparkles,
+} from 'lucide-astro';
 import Base from '../layouts/Base.astro';
 import { getSocial } from '../lib/social';
+import tagData from '../data/tags.json';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -11,6 +15,7 @@ const { bilibili, steam } = await getSocial();
 const steamState: Record<string, string> = {
   online: '在线', offline: '离线', 'in-game': '游戏中', away: '离开', snooze: '打盹', busy: '忙碌',
 };
+const tags: string[] = tagData as string[];
 const friends = [
   { name: '示例朋友 A', url: 'https://example.com', desc: '写点技术' },
   { name: '示例朋友 B', url: 'https://example.org', desc: '生活与摄影' },
@@ -34,8 +39,8 @@ const friends = [
         <span class="type" data-text="这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。">这里是我的小站 —— 记录技术、生活，和一些没头没尾的想法。慢慢写，慢慢长。</span>
       </p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#posts" data-anchor>阅读文章</a>
-        <a class="btn" href="#about" data-anchor>关于我</a>
+        <a class="btn btn-primary" href="#posts" data-anchor><BookOpen size={16} />阅读文章</a>
+        <a class="btn" href="#about" data-anchor><User size={16} />关于我</a>
       </div>
       <div class="hero-social">
         <a class="social-btn" href="https://github.com/rrl0721" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub · rrl0721">
@@ -62,12 +67,13 @@ const friends = [
         <div class="po-title">关于</div>
         <div class="po-sep"></div>
         <a href="#about-me" data-anchor>关于我</a>
+        <a href="#about-tags" data-anchor>标签星系</a>
         <a href="#about-home" data-anchor>我的主页</a>
         <a href="#about-contact" data-anchor>关于本站</a>
       </aside>
       <div class="page-body">
         <div class="sub-slide" id="about-me" data-slide>
-          <h2 class="sub-title">关于我</h2>
+          <h2 class="sub-title"><User size={22} />关于我</h2>
           <div class="profile-mini">
             <img class="pm-avatar" src="/social/bilibili.jpg" alt="Lufu_Enter" loading="lazy" />
             <div class="pm-name">Lufu_Enter</div>
@@ -79,8 +85,15 @@ const friends = [
             </div>
           </div>
         </div>
+        <div class="sub-slide" id="about-tags" data-slide>
+          <h2 class="sub-title"><Sparkles size={22} />标签星系</h2>
+          <p class="sphere-hint">拖动旋转 · 这是我的一部分标签</p>
+          <div class="tag-sphere-wrap">
+            <canvas id="tag-sphere" data-tags={JSON.stringify(tags)}></canvas>
+          </div>
+        </div>
         <div class="sub-slide" id="about-home" data-slide>
-          <h2 class="sub-title">我的主页</h2>
+          <h2 class="sub-title"><Link2 size={22} />我的主页</h2>
           <div class="home-links">
             <a class="home-link bili" href="/about/bilibili/">
               <span class="hl-title">哔哩哔哩</span>
@@ -93,7 +106,7 @@ const friends = [
           </div>
         </div>
         <div class="sub-slide" id="about-contact" data-slide>
-          <h2 class="sub-title">关于本站</h2>
+          <h2 class="sub-title"><Info size={22} />关于本站</h2>
           <div class="prose">
             <ul>
               <li>用 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 搭建</li>
@@ -121,7 +134,7 @@ const friends = [
       </aside>
       <div class="page-body">
         <div class="sub-slide" id="search-slide" data-slide>
-          <h2 class="sub-title">搜索</h2>
+          <h2 class="sub-title"><Search size={22} />搜索</h2>
           <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
           <div id="search-ui"></div>
           <script is:inline src="/pagefind/pagefind-ui.js"></script>
@@ -140,7 +153,7 @@ const friends = [
       </aside>
       <div class="page-body">
         <div class="sub-slide" id="gallery-slide" data-slide>
-          <h2 class="sub-title">相册</h2>
+          <h2 class="sub-title"><ImageIcon size={22} />相册</h2>
           <div class="gallery-grid">
             {galleryItems.map((it, i) => (
               <figure class="gallery-item reveal" style={`--rd:${i * 70}ms`}>
@@ -174,7 +187,7 @@ const friends = [
             {posts.map((p, i) => (
               <a class="post-card reveal" style={`--rd:${i * 70}ms`} href={`/posts/${p.id}/`}>
                 <h3>{p.data.title}</h3>
-                <div class="meta">{p.data.date.toLocaleDateString('zh-CN')}</div>
+                <div class="meta"><CalendarDays size={13} />{p.data.date.toLocaleDateString('zh-CN')}</div>
                 {p.data.summary && <div class="summary">{p.data.summary}</div>}
                 {p.data.tags.length > 0 && (
                   <div class="tags">
@@ -200,12 +213,12 @@ const friends = [
       </aside>
       <div class="page-body">
         <div class="sub-slide" id="friends-slide" data-slide>
-          <h2 class="sub-title">友链</h2>
+          <h2 class="sub-title"><Heart size={22} />友链</h2>
           <p style="color:var(--muted)">一些朋友的小站，欢迎去看看。</p>
           <div class="friends reveal">
             {friends.map((f) => (
               <a class="friend" href={f.url} target="_blank" rel="noopener">
-                <span class="avatar"></span>
+                <Link2 size={15} />
                 <span>{f.name}</span>
               </a>
             ))}
@@ -685,6 +698,120 @@ const friends = [
     }
     document.addEventListener('astro:page-load', initSpy);
     initSpy();
+
+    // 标签星系: 3D 球状标签云(拖拽旋转)
+    function initTagSphere() {
+      const canvas = document.getElementById('tag-sphere') as HTMLCanvasElement | null;
+      if (!canvas || canvas.dataset.ready) return;
+      canvas.dataset.ready = '1';
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      let tags: string[] = [];
+      try { tags = JSON.parse(canvas.dataset.tags || '[]'); } catch {}
+      if (!tags.length) return;
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const N = tags.length;
+      const pts = tags.map((t, i) => {
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / N);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        return { t, x: Math.cos(theta) * Math.sin(phi), y: Math.sin(theta) * Math.sin(phi), z: Math.cos(phi) };
+      });
+      let w = 0, h = 0, raf = 0, running = false;
+      let rx = -0.15, ry = 0.35, vrx = 0, vry = 0;
+      let dragging = false, lx = 0, ly = 0;
+      let ar = 110, ag = 168, ab = 255, nr = 232, ng = 233, nb = 236;
+      const readColors = () => {
+        const read = (name: string, fb: number[]) => {
+          const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+          const m = /^#?([0-9a-f]{6})$/i.exec(v);
+          if (m) { const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+          return fb;
+        };
+        [ar, ag, ab] = read('--accent', [110, 168, 255]);
+        [nr, ng, nb] = read('--fg', [232, 233, 236]);
+      };
+      readColors();
+      document.addEventListener('palettechange', readColors);
+
+      const resize = () => {
+        const r = canvas.getBoundingClientRect();
+        w = r.width; h = r.height;
+        canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+
+      const render = () => {
+        ctx.clearRect(0, 0, w, h);
+        const cx = w / 2, cy = h / 2;
+        const R = Math.min(w, h) * 0.37;
+        const cosX = Math.cos(rx), sinX = Math.sin(rx);
+        const cosY = Math.cos(ry), sinY = Math.sin(ry);
+        const items = pts
+          .map((p) => {
+            const x1 = p.x * cosY - p.z * sinY;
+            const z1 = p.x * sinY + p.z * cosY;
+            const y2 = p.y * cosX - z1 * sinX;
+            const z2 = p.y * sinX + z1 * cosX;
+            return { t: p.t, x: x1, y: y2, z: z2 };
+          })
+          .sort((a, b) => a.z - b.z);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (const it of items) {
+          const persp = 1 / (1.55 - it.z * 0.55);
+          const px = cx + it.x * R * persp;
+          const py = cy + it.y * R * persp;
+          const depth = (it.z + 1) / 2;
+          const size = 11 + depth * 11;
+          const alpha = 0.16 + depth * 0.84;
+          const r = Math.round(nr + (ar - nr) * depth);
+          const g = Math.round(ng + (ag - ng) * depth);
+          const b = Math.round(nb + (ab - nb) * depth);
+          ctx.font = `600 ${size.toFixed(1)}px "LXGW WenKai", "Inter Variable", sans-serif`;
+          ctx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+          ctx.fillText(it.t, px, py);
+        }
+      };
+
+      const loop = () => {
+        if (!canvas.isConnected) return;
+        if (!dragging) {
+          ry += 0.0035 + vry;
+          rx += 0.0012 + vrx;
+          vry *= 0.96; vrx *= 0.96;
+        }
+        render();
+        if (running) raf = requestAnimationFrame(loop);
+      };
+      const start = () => { if (!running) { running = true; raf = requestAnimationFrame(loop); } };
+      const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+      canvas.addEventListener('pointerdown', (e) => {
+        dragging = true; lx = e.clientX; ly = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - lx, dy = e.clientY - ly;
+        lx = e.clientX; ly = e.clientY;
+        ry += dx * 0.006; rx += dy * 0.006;
+        vry = dx * 0.0005; vrx = dy * 0.0005;
+        if (reduce) render();
+      });
+      const up = () => { dragging = false; };
+      canvas.addEventListener('pointerup', up);
+      canvas.addEventListener('pointercancel', up);
+
+      resize();
+      new ResizeObserver(resize).observe(canvas);
+      if (reduce) render();
+      else new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0 }).observe(canvas);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+    }
+    document.addEventListener('astro:page-load', initTagSphere);
+    initTagSphere();
 
     // 首页磁性翻页: 在所有 [data-slide] 区块之间翻页(滚轮 + 顶栏锚点)
     if (!(window as any).__pptWheel) {
