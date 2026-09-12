@@ -515,6 +515,19 @@ html:has(.bili-page) { background: #fff6f9; }
 html[data-nav="back"] ::view-transition-old(root) { animation: slide-out-right .45s cubic-bezier(.4, 0, .2, 1) both; }
 html[data-nav="back"] ::view-transition-new(root) { animation: slide-in-left .45s cubic-bezier(.4, 0, .2, 1) both; }
 
+/* Markdown 彩色文字 + 高亮 */
+.c-pink { color: #fb7299; }
+.c-blue { color: #6ea8ff; }
+.c-purple { color: #c08bff; }
+.c-cyan { color: #57cbde; }
+.c-green { color: #7ed08a; }
+.c-amber { color: #f0b35b; }
+.c-red { color: #ff7a7a; }
+.prose mark, mark {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--fg); padding: 1px 6px; border-radius: 6px;
+}
+
 /* 滚动出现动画 */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
 .reveal.in { opacity: 1; transform: none; }

@@ -48,6 +48,23 @@ npm run preview             # 预览构建产物 http://localhost:4322
 > 本地构建时 Steam 抓取需要代理：`https_proxy=http://127.0.0.1:7897 npm run build`
 > Cloudflare 构建环境在境外，可直连，无需代理。
 
+## 写作语法（Markdown 彩色文字）
+
+在文章正文和标题里都能用：
+
+```md
+## {pink}粉色标题{/pink} 与 {blue}蓝色标题{/blue}
+
+正文彩色：{purple}紫色{/purple} {cyan}青色{/cyan} {green}绿色{/green}
+{amber}琥珀{/amber} {red}红色{/red} {pink}粉色{/pink} {blue}蓝色{/blue}
+
+高亮标记：==这段会高亮==
+```
+
+- 可用颜色：`pink / blue / purple / cyan / green / amber / red`
+- 代码块与行内代码里的语法**不会被转换**（可以放心写示例）
+- 实现：`src/plugins/rehype-colors.mjs`（Astro 配置里注册）；颜色样式在 `src/styles/global.css` 的 `.c-*`
+
 ## 备注
 
 - 站点地址已配置：`astro.config.mjs` → `site: 'https://lufusblog.top'`（RSS 绝对链接用）
