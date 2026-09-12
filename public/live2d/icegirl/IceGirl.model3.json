@@ -1,0 +1,136 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "IceGirl.moc3",
+    "Textures": [
+      "textures/texture_00.webp",
+      "textures/texture_01.webp",
+      "textures/texture_02.webp",
+      "textures/texture_03.webp"
+    ],
+    "Physics": "IceGirl.physics3.json",
+    "DisplayInfo": "IceGirl.cdi3.json",
+    "Motions": {
+      "Idle": [
+        {
+          "File": "motions/idle.motion3.json",
+          "FadeInTime": 0.6,
+          "FadeOutTime": 0.6
+        }
+      ],
+      "Wave": [
+        {
+          "File": "motions/wave.motion3.json",
+          "FadeInTime": 0.4,
+          "FadeOutTime": 0.6
+        }
+      ],
+      "Flirt": [
+        {
+          "File": "motions/flirt.motion3.json",
+          "FadeInTime": 0.4,
+          "FadeOutTime": 0.6
+        }
+      ]
+    },
+    "Expressions": [
+      {
+        "Name": "猫耳",
+        "File": "expressions/cat-ears.exp3.json"
+      },
+      {
+        "Name": "披发",
+        "File": "expressions/hair-down.exp3.json"
+      },
+      {
+        "Name": "马尾",
+        "File": "expressions/ponytail.exp3.json"
+      },
+      {
+        "Name": "王冠",
+        "File": "expressions/crown.exp3.json"
+      },
+      {
+        "Name": "翅膀",
+        "File": "expressions/wings.exp3.json"
+      },
+      {
+        "Name": "脸红",
+        "File": "expressions/blush.exp3.json"
+      },
+      {
+        "Name": "星星眼",
+        "File": "expressions/star-eyes.exp3.json"
+      },
+      {
+        "Name": "爱心眼",
+        "File": "expressions/heart-eyes.exp3.json"
+      },
+      {
+        "Name": "金钱眼",
+        "File": "expressions/money-eyes.exp3.json"
+      },
+      {
+        "Name": "白眼",
+        "File": "expressions/white-eyes.exp3.json"
+      },
+      {
+        "Name": "生气",
+        "File": "expressions/angry.exp3.json"
+      },
+      {
+        "Name": "惊讶",
+        "File": "expressions/surprised.exp3.json"
+      },
+      {
+        "Name": "疑惑",
+        "File": "expressions/confused.exp3.json"
+      },
+      {
+        "Name": "流泪",
+        "File": "expressions/tears.exp3.json"
+      },
+      {
+        "Name": "脸黑",
+        "File": "expressions/dark-face.exp3.json"
+      },
+      {
+        "Name": "舌头",
+        "File": "expressions/tongue.exp3.json"
+      },
+      {
+        "Name": "手柄",
+        "File": "expressions/controller.exp3.json"
+      },
+      {
+        "Name": "直播套装",
+        "File": "expressions/live-outfit.exp3.json"
+      },
+      {
+        "Name": "←歪嘴",
+        "File": "expressions/mouth-left.exp3.json"
+      },
+      {
+        "Name": "歪嘴→",
+        "File": "expressions/mouth-right.exp3.json"
+      }
+    ]
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": [
+        "ParamMouthOpenY"
+      ]
+    },
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    }
+  ]
+}

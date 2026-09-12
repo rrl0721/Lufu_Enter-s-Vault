@@ -5,6 +5,7 @@ import '@fontsource-variable/source-serif-4';
 import 'lxgw-wenkai-webfont/lxgwwenkai-regular.css';
 import 'lxgw-wenkai-webfont/lxgwwenkai-bold.css';
 import { ClientRouter } from 'astro:transitions';
+import Live2DAssistant from '../components/Live2DAssistant.astro';
 import '../styles/global.css';
 
 interface Props { title?: string; description?: string; bodyClass?: string; image?: string; }
@@ -122,6 +123,9 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
   </footer>
 
   <button class="to-top" id="toTop" aria-label="回到顶部"><ArrowUp size={18} /></button>
+
+  {/* Live2D 看板娘 + AI 对话 */}
+  <Live2DAssistant />
 
   {/* 图片灯箱 */}
   <div class="lightbox" id="lightbox" aria-hidden="true">

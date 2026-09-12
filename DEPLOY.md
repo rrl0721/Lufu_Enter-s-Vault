@@ -69,3 +69,24 @@ npm run preview             # 预览构建产物 http://localhost:4322
 
 - 站点地址已配置：`astro.config.mjs` → `site: 'https://lufusblog.top'`（RSS 绝对链接用）
 - RSS：`/rss.xml`；搜索：Pagefind（构建时生成）
+
+## AI 看板娘与对话（小冰）
+
+- 前端组件：`src/components/Live2DAssistant.astro`（全站右下角，`transition:persist` 跨页保持）
+- Live2D 模型：`public/live2d/icegirl/`（IceGirl · Cubism 3；纹理已压成 WebP，全量约 4.3MB，桌面端空闲懒加载；默认表情「猫耳」）
+- 运行时：`public/live2d/live2dcubismcore.min.js` + npm 依赖 `pixi.js@6` / `pixi-live2d-display`
+
+### 对话后端（本地优先）
+
+1. **本地 llama.cpp（默认）**：OpenAI 兼容端点 `http://127.0.0.1:8080`
+   ```sh
+   llama-server -m ~/.local/share/llama-models/Qwen3-VL-4B-Instruct-Q4_K_M.gguf \
+     --mmproj ~/.local/share/llama-models/mmproj-F16.gguf \
+     -c 8192 -ngl 99 --host 127.0.0.1 --port 8080
+   ```
+   - 端点覆盖：控制台执行 `localStorage.setItem('l2d-local', 'http://127.0.0.1:8080')`（置空字符串则禁用本地直连）
+   - 本地连不上会自动回退到 Worker `/api/chat`
+2. **Cloudflare Worker 回退**：`src/worker.js`；如需启用，在 CF Dashboard → Workers → ownblog → Settings → 变量和密钥，添加加密变量 `DEEPSEEK_API_KEY`（未配置时返回 503）
+3. 人设（PERSONA）：前端在 `Live2DAssistant.astro`、Worker 在 `src/worker.js`，两处保持同步
+
+> HTTPS 页面调用 `http://127.0.0.1`：Firefox / Chrome 对 localhost 豁免混合内容限制，Safari 可能拦截。

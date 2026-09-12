@@ -176,7 +176,7 @@
   },
   "steam": {
     "name": "Lufu_Enter",
-    "avatar": "https://avatars.fastly.steamstatic.com/2874a35f61aa30d0ff8d09541df1266377fb6eff_full.jpg",
+    "avatar": "https://avatars.akamai.steamstatic.com/2874a35f61aa30d0ff8d09541df1266377fb6eff_full.jpg",
     "avatarLocal": "/social/steam.jpg",
     "state": "offline",
     "stateText": "Offline",
@@ -206,5 +206,5 @@
     "hoursTotal": 0,
     "gamesPublic": true
   },
-  "updatedAt": "2026-09-12T13:59:19.626Z"
+  "updatedAt": "2026-09-12T14:35:59.070Z"
 }

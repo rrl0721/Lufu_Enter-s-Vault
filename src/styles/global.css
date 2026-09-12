@@ -859,7 +859,7 @@ html { background: var(--bg); }
 
 /* 回到顶部 */
 .to-top {
-  position: fixed; right: 22px; bottom: 22px; z-index: 40;
+  position: fixed; right: 22px; bottom: 88px; z-index: 40;
   width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
   border: 1px solid var(--border); background: var(--card); color: var(--fg);
   opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
@@ -902,4 +902,89 @@ footer.site-footer .wrap { display: flex; justify-content: space-between; flex-w
     opacity: 1 !important; transform: none !important;
   }
   .title-anim { letter-spacing: 2px; }
+}
+
+/* ===== Live2D 看板娘 + AI 对话 ===== */
+.l2d-toggle {
+  position: fixed; right: 22px; bottom: 22px; z-index: 46;
+  width: 56px; height: 56px; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: var(--card);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+  transition: transform .25s ease, border-color .25s ease, opacity .25s ease;
+}
+.l2d-toggle[hidden] { display: none; }
+.l2d-toggle img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.l2d-toggle:hover { transform: translateY(-3px) scale(1.05); border-color: var(--accent); }
+.l2d-toggle .l2d-ring {
+  position: absolute; inset: -6px; border-radius: 50%; pointer-events: none;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: l2dPulse 2.8s ease-out infinite;
+}
+@keyframes l2dPulse { 0% { transform: scale(.82); opacity: .9; } 70%, 100% { transform: scale(1.2); opacity: 0; } }
+.l2d-toggle.loading img { opacity: .4; }
+.l2d-toggle.loading::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  border: 2px solid transparent; border-top-color: var(--accent);
+  animation: l2dSpin .8s linear infinite;
+}
+@keyframes l2dSpin { to { transform: rotate(360deg); } }
+
+.l2d-stage { position: fixed; right: 6px; bottom: 0; z-index: 45; width: 320px; height: 400px; pointer-events: none; }
+.l2d-stage[hidden] { display: none; }
+.l2d-stage canvas { width: 100%; height: 100%; display: block; }
+
+.l2d-loading {
+  position: fixed; right: 26px; bottom: 32px; z-index: 47;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 999px; padding: 8px 14px;
+  box-shadow: var(--shadow);
+}
+.l2d-loading[hidden] { display: none; }
+.l2d-loading span {
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  animation: l2dSpin .8s linear infinite;
+}
+
+.l2d-chat {
+  position: fixed; right: 336px; bottom: 20px; z-index: 46;
+  width: 340px; height: min(500px, calc(100vh - 130px));
+  display: flex; flex-direction: column;
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border); border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+  overflow: hidden;
+}
+.l2d-chat[hidden] { display: none; }
+.l2d-head { display: flex; align-items: center; gap: 10px; padding: 12px 12px 10px 14px; border-bottom: 1px solid var(--border); }
+.l2d-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.l2d-who { flex: 1; display: flex; flex-direction: column; line-height: 1.3; }
+.l2d-who b { font-size: 14px; }
+.l2d-who span { font-size: 11.5px; color: var(--muted); }
+.l2d-ibtn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; border: 1px solid transparent; background: none; color: var(--muted); cursor: pointer; }
+.l2d-ibtn:hover { color: var(--fg); border-color: var(--border); background: var(--bg-soft); }
+.l2d-msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; }
+.l2d-msg { max-width: 84%; font-size: 13.5px; line-height: 1.7; padding: 9px 13px; border-radius: 14px; white-space: pre-wrap; word-break: break-word; }
+.l2d-msg.ai { align-self: flex-start; background: var(--bg-soft); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+.l2d-msg.me { align-self: flex-end; background: color-mix(in srgb, var(--accent) 20%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent); border-bottom-right-radius: 5px; }
+.l2d-form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border); }
+.l2d-form input { flex: 1; min-width: 0; border: 1px solid var(--border); background: var(--bg-soft); color: var(--fg); border-radius: 10px; padding: 9px 12px; font-size: 13.5px; outline: none; font-family: inherit; }
+.l2d-form input:focus { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.l2d-form button { width: 40px; flex: none; border-radius: 10px; cursor: pointer; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); background: color-mix(in srgb, var(--accent) 18%, var(--card)); color: var(--fg); }
+.l2d-form button:hover { background: color-mix(in srgb, var(--accent) 32%, var(--card)); }
+.l2d-note { text-align: center; font-size: 10.5px; color: var(--muted); padding: 0 0 8px; }
+
+/* 看板娘出现时避让回到顶部按钮 */
+html.l2d-on .to-top { right: 344px; bottom: 22px; }
+html.l2d-open .to-top { right: 700px; }
+
+@media (max-width: 767px) {
+  .l2d-stage { display: none !important; }
+  .l2d-toggle { width: 50px; height: 50px; }
+  .l2d-chat { left: 12px; right: 12px; width: auto; bottom: 12px; height: 64vh; }
+  html.l2d-open .to-top { opacity: 0; pointer-events: none; }
 }
