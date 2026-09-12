@@ -718,6 +718,15 @@ const friends = [
         const theta = Math.PI * (1 + Math.sqrt(5)) * i;
         return { t, x: Math.cos(theta) * Math.sin(phi), y: Math.sin(theta) * Math.sin(phi), z: Math.cos(phi) };
       });
+      // 近邻连线(球面距离)
+      const edges: [number, number][] = [];
+      const MAXD = 1.02;
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y, pts[i].z - pts[j].z);
+          if (d < MAXD) edges.push([i, j]);
+        }
+      }
       let w = 0, h = 0, raf = 0, running = false;
       let rx = -0.15, ry = 0.35, vrx = 0, vry = 0;
       let dragging = false, lx = 0, ly = 0;
@@ -745,26 +754,42 @@ const friends = [
       const render = () => {
         ctx.clearRect(0, 0, w, h);
         const cx = w / 2, cy = h / 2;
-        const R = Math.min(w, h) * 0.37;
+        const R = Math.min(w, h) * 0.40;
         const cosX = Math.cos(rx), sinX = Math.sin(rx);
         const cosY = Math.cos(ry), sinY = Math.sin(ry);
+        const project = (p: { x: number; y: number; z: number }) => {
+          const x1 = p.x * cosY - p.z * sinY;
+          const z1 = p.x * sinY + p.z * cosY;
+          const y2 = p.y * cosX - z1 * sinX;
+          const z2 = p.y * sinX + z1 * cosX;
+          const persp = 1 / (1.55 - z2 * 0.55);
+          return { x: cx + x1 * R * persp, y: cy + y2 * R * persp, z: z2 };
+        };
+        const proj = pts.map(project);
+        // 白色细线(浅色主题下用前景色, 保证可见)
+        const light = nr + ng + nb > 382;
+        const lr = light ? nr : 255, lg = light ? ng : 255, lb = light ? nb : 255;
+        ctx.lineWidth = 0.7;
+        for (const [i, j] of edges) {
+          const a = proj[i], b = proj[j];
+          const depth = ((a.z + b.z) / 2 + 1) / 2;
+          const alpha = 0.06 + depth * 0.34;
+          ctx.strokeStyle = `rgba(${lr},${lg},${lb},${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
         const items = pts
-          .map((p) => {
-            const x1 = p.x * cosY - p.z * sinY;
-            const z1 = p.x * sinY + p.z * cosY;
-            const y2 = p.y * cosX - z1 * sinX;
-            const z2 = p.y * sinX + z1 * cosX;
-            return { t: p.t, x: x1, y: y2, z: z2 };
-          })
+          .map((p, i) => ({ t: p.t, x: proj[i].x, y: proj[i].y, z: proj[i].z }))
           .sort((a, b) => a.z - b.z);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         for (const it of items) {
-          const persp = 1 / (1.55 - it.z * 0.55);
-          const px = cx + it.x * R * persp;
-          const py = cy + it.y * R * persp;
+          const px = it.x;
+          const py = it.y;
           const depth = (it.z + 1) / 2;
-          const size = 11 + depth * 11;
+          const size = 10.5 + depth * 10;
           const alpha = 0.16 + depth * 0.84;
           const r = Math.round(nr + (ar - nr) * depth);
           const g = Math.round(ng + (ag - ng) * depth);
