@@ -10,6 +10,12 @@
   src: url('/fonts/ComicShannsMono-Bold.otf') format('opentype');
   font-weight: 700; font-style: normal; font-display: swap;
 }
+/* 代码字体: 3270 Nerd Font (Mono) */
+@font-face {
+  font-family: '3270 Nerd Font';
+  src: url('/fonts/3270NerdFontMono-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
 
 :root {
   color-scheme: dark;
@@ -30,8 +36,8 @@
   /* ComicShannsMono = 备用显示字体(主字体缺字/加载失败时顶上) */
   --font-display: 'Source Serif 4 Variable', 'ComicShannsMono', 'Noto Serif CJK SC', Georgia, 'Songti SC', serif;
   --font-serif: 'Source Serif 4 Variable', 'ComicShannsMono', 'Noto Serif CJK SC', Georgia, 'Songti SC', serif;
-  --font-sans: 'Inter Variable', 'ComicShannsMono', -apple-system, 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-  --font-mono: 'ComicShannsMono', ui-monospace, 'JetBrains Mono', monospace;
+  --font-sans: 'LXGW WenKai', 'Inter Variable', 'ComicShannsMono', -apple-system, 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: '3270 Nerd Font', 'ComicShannsMono', ui-monospace, 'JetBrains Mono', monospace;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 80px; }
