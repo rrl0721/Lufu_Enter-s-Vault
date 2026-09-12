@@ -242,6 +242,15 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
             document.dispatchEvent(new CustomEvent('palettechange', { detail: name }));
           };
         });
+        if (!w.__paletteSync) {
+          w.__paletteSync = true;
+          addEventListener('storage', (e) => {
+            if (e.key === 'palette' && e.newValue) {
+              document.documentElement.setAttribute('data-palette', e.newValue);
+              document.dispatchEvent(new CustomEvent('palettechange', { detail: e.newValue }));
+            }
+          });
+        }
         if (!w.__palOutside) {
           w.__palOutside = true;
           document.addEventListener('click', (e) => {

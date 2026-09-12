@@ -601,22 +601,33 @@ html { background: var(--bg); }
 }
 .page-outline {
   position: sticky; top: calc(var(--dock-h) + var(--dock-gap) + 26px);
-  align-self: start; padding-top: 78px; font-size: 13.5px;
+  align-self: start; padding-top: 78px;
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6;
 }
 .page-outline .po-title {
-  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px; padding-left: 12px;
+  color: var(--accent); letter-spacing: .06em; padding-left: 2px;
+}
+.page-outline .po-sep {
+  border-top: 1px dashed color-mix(in srgb, var(--muted) 50%, transparent);
+  margin: 5px 0 10px; width: 88%;
 }
 .page-outline a {
-  display: block; padding: 7px 12px; margin-bottom: 2px; border-radius: 9px;
-  color: var(--muted); border-left: 2px solid transparent;
-  transition: color .18s ease, background .18s ease, border-color .18s ease;
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 6px; margin-bottom: 1px; border-radius: 7px;
+  color: var(--muted); border: 0;
+  transition: color .18s ease, background .18s ease;
+}
+.page-outline a::before {
+  content: '●'; font-size: 8px; line-height: 1;
+  color: color-mix(in srgb, var(--muted) 55%, transparent);
+  transition: color .18s ease;
 }
 .page-outline a:hover { color: var(--fg); text-decoration: none; background: color-mix(in srgb, var(--fg) 6%, transparent); }
 .page-outline a.active {
-  color: var(--fg); background: color-mix(in srgb, var(--accent) 13%, transparent);
-  border-left-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
 }
+.page-outline a.active::before { color: var(--accent); }
 .sub-slide {
   min-height: calc(100vh - var(--dock-h) - var(--dock-gap));
   min-height: calc(100svh - var(--dock-h) - var(--dock-gap));
