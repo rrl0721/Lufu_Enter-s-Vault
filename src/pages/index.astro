@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import {
-  BookOpen, User, Link2, Info, Search, Image as ImageIcon, Newspaper, Heart, CalendarDays, Sparkles, PenLine,
+  BookOpen, User, Link2, Info, Search, Image as ImageIcon, Newspaper, Heart, CalendarDays, Sparkles, PenLine, Compass, Music,
 } from 'lucide-astro';
 import Base from '../layouts/Base.astro';
 import { getSocial } from '../lib/social';
@@ -73,14 +73,48 @@ const friends = friendData as { name: string; url: string; desc: string; avatar:
       <div class="page-body">
         <div class="sub-slide" id="about-me" data-slide>
           <h2 class="sub-title"><User size={22} />关于我</h2>
-          <div class="profile-mini">
-            <img class="pm-avatar" src="/social/bilibili.jpg" alt="Lufu_Enter" loading="lazy" />
-            <div class="pm-name">Lufu_Enter</div>
-            <div class="pm-title">爱摸鱼的幻想家</div>
-            <div class="pm-grid">
-              <div class="pm-item school"><span>学校</span><b>安徽师范大学</b></div>
-              <div class="pm-item loc"><span>现居</span><b>安徽芜湖</b></div>
-              <div class="pm-item bday"><span>生日</span><b>11 月 30 日</b></div>
+          <div class="about-me-grid">
+            <div class="about-me-left">
+              <div class="profile-mini">
+                <img class="pm-avatar" src="/social/bilibili.jpg" alt="Lufu_Enter" loading="lazy" />
+                <div class="pm-name">Lufu_Enter</div>
+                <div class="pm-title">爱摸鱼的幻想家</div>
+                <div class="pm-grid">
+                  <div class="pm-item school"><span>学校</span><b>安徽师范大学</b></div>
+                  <div class="pm-item loc"><span>现居</span><b>安徽芜湖</b></div>
+                  <div class="pm-item bday"><span>生日</span><b>11 月 30 日</b></div>
+                </div>
+              </div>
+              <div class="am-quote">
+                <p>我思故我在</p>
+                <span>Cogito, ergo sum</span>
+              </div>
+            </div>
+            <div class="about-me-side">
+              <p class="am-bio">一个爱摸鱼的幻想家。<br />喜欢轻音乐、追番，也喜欢在虚拟世界里散步。</p>
+              <div class="am-block">
+                <h4><Compass size={16} />正在折腾</h4>
+                <ul class="am-now">
+                  <li><b>这个小站</b><span>一砖一瓦都是自己搭的</span></li>
+                  <li><b>VRChat</b><span>在虚拟世界里散步</span></li>
+                  <li><b>轻音乐收藏</b><span>攒了满满一个收藏夹</span></li>
+                </ul>
+              </div>
+              <div class="am-block">
+                <h4><Music size={16} />兴趣</h4>
+                <div class="about-feats">
+                  <span>轻音乐</span>
+                  <span>追番</span>
+                  <span>VRChat</span>
+                  <span>折腾小玩意</span>
+                  <span>幻想</span>
+                </div>
+              </div>
+              <div class="am-stats">
+                <div><b>{posts.length}</b><span>篇文章</span></div>
+                <div><b>{tags.length}</b><span>个标签</span></div>
+                <div><b>{friends.length}</b><span>位朋友</span></div>
+              </div>
             </div>
           </div>
         </div>
