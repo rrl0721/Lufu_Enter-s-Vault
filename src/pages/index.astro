@@ -77,6 +77,17 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
   </section>
 
   <script>
+    // 读取主题主色(供 Canvas 跟随配色)
+    function readAccentRGB(): [number, number, number] {
+      const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const m = /^#?([0-9a-f]{6})$/i.exec(v);
+      if (m) {
+        const n = parseInt(m[1], 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      }
+      return [110, 168, 255];
+    }
+
     // 背景: 俯视海浪点阵(Canvas, 低开销)
     function initHeroDots() {
       const canvas = document.querySelector('canvas.hero-dots') as HTMLCanvasElement | null;
@@ -90,15 +101,25 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       const GAP = 22;
       // 波谷→波峰: 灰蓝(有但不发光) → 高亮高饱和蓝
       const BUCKETS = 7;
-      const colors = Array.from({ length: BUCKETS }, (_, k) => {
-        const v = k / (BUCKETS - 1);
-        const r = Math.round(145 + (76 - 145) * v);
-        const g = Math.round(152 + (196 - 152) * v);
-        const b = Math.round(165 + (255 - 165) * v);
-        const a = 0.1 + 0.85 * Math.pow(v, 1.6);
-        return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+      let [ar, ag, ab] = readAccentRGB();
+      let colors: string[] = [];
+      let HALO = '';
+      const buildColors = () => {
+        colors = Array.from({ length: BUCKETS }, (_, k) => {
+          const v = k / (BUCKETS - 1);
+          const r = Math.round(145 + (ar - 145) * v);
+          const g = Math.round(152 + (ag - 152) * v);
+          const b = Math.round(165 + (ab - 165) * v);
+          const a = 0.1 + 0.85 * Math.pow(v, 1.6);
+          return `rgba(${r},${g},${b},${a.toFixed(3)})`;
+        });
+        HALO = `rgba(${Math.min(255, ar + 20)},${Math.min(255, ag + 20)},${Math.min(255, ab + 20)},0.22)`;
+      };
+      buildColors();
+      document.addEventListener('palettechange', () => {
+        [ar, ag, ab] = readAccentRGB();
+        buildColors();
       });
-      const HALO = 'rgba(96,190,255,0.22)';
       const TRAIL_MS = 280, R_TRAIL = 42, RIPPLE_MS = 1500, R_BAND = 34;
       const trail: { x: number; y: number; t: number }[] = [];
       const ripples: { x: number; y: number; t0: number; max: number; amp: number; ring: boolean }[] = [];
@@ -327,6 +348,8 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       const rand = (a: number, b: number) => a + Math.random() * (b - a);
       const stars: { x: number; y: number; r: number; phase: number; speed: number }[] = [];
       const meteors: { x: number; y: number; vx: number; vy: number; len: number; life: number; maxLife: number }[] = [];
+      let [mr, mg, mb] = readAccentRGB();
+      document.addEventListener('palettechange', () => { [mr, mg, mb] = readAccentRGB(); });
       let w = 0, h = 0, raf = 0, running = false, lastMeteor = 0, nextMeteor = 1200;
 
       const resize = () => {
@@ -388,9 +411,9 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
           const tx = m.x - (m.vx / mag) * m.len;
           const ty = m.y - (m.vy / mag) * m.len;
           const grad = ctx.createLinearGradient(m.x, m.y, tx, ty);
-          grad.addColorStop(0, `rgba(225,238,255,${(0.9 * fade).toFixed(3)})`);
-          grad.addColorStop(0.45, `rgba(150,190,255,${(0.32 * fade).toFixed(3)})`);
-          grad.addColorStop(1, 'rgba(150,190,255,0)');
+          grad.addColorStop(0, `rgba(235,244,255,${(0.9 * fade).toFixed(3)})`);
+          grad.addColorStop(0.45, `rgba(${mr},${mg},${mb},${(0.36 * fade).toFixed(3)})`);
+          grad.addColorStop(1, `rgba(${mr},${mg},${mb},0)`);
           ctx.strokeStyle = grad;
           ctx.lineWidth = 1.6;
           ctx.lineCap = 'round';

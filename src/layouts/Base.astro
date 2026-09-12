@@ -46,6 +46,14 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
   <ClientRouter />
+  <script is:inline>
+    (function () {
+      try {
+        var p = localStorage.getItem('palette');
+        if (p) document.documentElement.setAttribute('data-palette', p);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body class={bodyClass}>
   <div class="load-bar" id="loadBar" aria-hidden="true"></div>
@@ -62,6 +70,17 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
           >{l.label}</a>
         ))}
       </nav>
+      <div class="palette" id="palette">
+        <button class="palette-btn" id="paletteBtn" aria-label="切换主题配色" title="切换主题配色">
+          <span class="palette-dot"></span>
+        </button>
+        <div class="palette-menu" id="paletteMenu">
+          <button data-palette="deep"><i style="--c:#6ea8ff"></i>深海夜</button>
+          <button data-palette="sakura"><i style="--c:#fb7299"></i>樱夜</button>
+          <button data-palette="sea"><i style="--c:#57cbde"></i>碧海</button>
+          <button data-palette="amber"><i style="--c:#f0b35b"></i>暮金</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -182,6 +201,33 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
             tilt.style.setProperty('--ry', '0deg');
           }
         });
+      }
+
+      // 主题配色切换
+      const pal = document.getElementById('palette');
+      const palBtn = document.getElementById('paletteBtn');
+      const palMenu = document.getElementById('paletteMenu');
+      if (pal && palBtn && palMenu) {
+        palBtn.onclick = (e) => {
+          e.stopPropagation();
+          pal.classList.toggle('open');
+        };
+        palMenu.querySelectorAll('button[data-palette]').forEach((b) => {
+          (b as HTMLElement).onclick = () => {
+            const name = (b as HTMLElement).dataset.palette || 'deep';
+            document.documentElement.setAttribute('data-palette', name);
+            try { localStorage.setItem('palette', name); } catch {}
+            pal.classList.remove('open');
+            document.dispatchEvent(new CustomEvent('palettechange', { detail: name }));
+          };
+        });
+        if (!w.__palOutside) {
+          w.__palOutside = true;
+          document.addEventListener('click', (e) => {
+            const p = document.getElementById('palette');
+            if (p && !p.contains(e.target as Node)) p.classList.remove('open');
+          });
+        }
       }
 
       // 翻页方向感知(按路径层级)
