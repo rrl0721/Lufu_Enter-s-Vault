@@ -199,10 +199,12 @@ img { max-width: 100%; border-radius: 12px; }
 }
 @media (max-width: 560px) {
   :root { --dock-h: 46px; --dock-gap: 8px; }
-  .site-header .dock { width: calc(100% - 24px); padding: 0 6px 0 14px; gap: 8px; }
-  .brand { font-size: 14px; }
+  .site-header .dock { width: calc(100% - 20px); padding: 0 5px 0 11px; gap: 4px; }
+  .brand { font-size: 13px; }
   .nav { gap: 0; }
-  .nav a { font-size: 13px; padding: 7px 9px; }
+  .nav a { font-size: 12px; padding: 6px 6px; }
+  .palette-btn { width: 28px; height: 28px; }
+  .palette-dot { width: 12px; height: 12px; }
 }
 
 /* 卡片列表 */
@@ -596,13 +598,17 @@ html { background: var(--bg); }
 /* ===== 单页区块 + 左侧目录 ===== */
 .page-section { position: relative; }
 .page-grid {
-  display: grid; grid-template-columns: 180px minmax(0, 1fr);
-  gap: 44px; max-width: 1060px; margin: 0 auto; padding: 0 20px;
+  display: grid;
+  grid-template-columns: clamp(130px, 13vw, 200px) minmax(0, 1fr);
+  gap: clamp(20px, 3.2vw, 48px);
+  max-width: min(1080px, 94vw);
+  margin: 0 auto; padding: 0 clamp(16px, 2vw, 28px);
 }
 .page-outline {
-  position: sticky; top: calc(var(--dock-h) + var(--dock-gap) + 26px);
-  align-self: start; padding-top: 78px;
-  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6;
+  position: sticky;
+  top: calc(var(--dock-h) + var(--dock-gap) + clamp(14px, 3vh, 30px));
+  align-self: start; padding-top: clamp(40px, 9vh, 84px);
+  font-family: var(--font-mono); font-size: clamp(11px, 0.85vw, 13.5px); line-height: 1.6;
 }
 .page-outline .po-title {
   color: var(--accent); letter-spacing: .06em; padding-left: 2px;
@@ -632,9 +638,9 @@ html { background: var(--bg); }
   min-height: calc(100vh - var(--dock-h) - var(--dock-gap));
   min-height: calc(100svh - var(--dock-h) - var(--dock-gap));
   display: flex; flex-direction: column; justify-content: center;
-  padding: 76px 0;
+  padding: clamp(40px, 8vh, 88px) 0;
 }
-.sub-title { font-size: clamp(22px, 3vw, 30px); margin: 0 0 18px; }
+.sub-title { font-size: clamp(20px, 2.6vw, 32px); margin: 0 0 18px; }
 .sub-slide .prose { max-width: 620px; }
 .posts .page-grid { position: relative; z-index: 1; }
 #search-ui {
@@ -650,7 +656,22 @@ html { background: var(--bg); }
 }
 @media (max-width: 860px) {
   .page-grid { grid-template-columns: 1fr; gap: 0; }
-  .page-outline { display: none; }
+  /* 小屏: 目录变吸顶胶囊条 */
+  .page-outline {
+    position: sticky; top: calc(var(--dock-h) + var(--dock-gap) + 6px); z-index: 6;
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 6px; padding: 10px 0 12px; font-size: 12px;
+    background: linear-gradient(to bottom, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .page-outline .po-title { margin-right: 4px; }
+  .page-outline .po-sep { display: none; }
+  .page-outline a {
+    padding: 4px 11px; border-radius: 999px; margin: 0;
+    background: color-mix(in srgb, var(--fg) 5%, transparent);
+  }
+  .page-outline a::before { display: none; }
+  .page-outline a.active { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 }
 
 /* 滚动出现动画 */
