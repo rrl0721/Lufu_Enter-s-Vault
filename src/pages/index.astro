@@ -6,6 +6,7 @@ import {
 import Base from '../layouts/Base.astro';
 import { getSocial } from '../lib/social';
 import tagData from '../data/tags.json';
+import friendData from '../data/friends.json';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -16,10 +17,7 @@ const steamState: Record<string, string> = {
   online: '在线', offline: '离线', 'in-game': '游戏中', away: '离开', snooze: '打盹', busy: '忙碌',
 };
 const tags: string[] = tagData as string[];
-const friends = [
-  { name: '示例朋友 A', url: 'https://example.com', desc: '写点技术' },
-  { name: '示例朋友 B', url: 'https://example.org', desc: '生活与摄影' },
-];
+const friends = friendData as { name: string; url: string; desc: string; avatar: string }[];
 ---
 <Base>
   {/* ===== 封面 ===== */}
@@ -217,9 +215,12 @@ const friends = [
           <p style="color:var(--muted)">一些朋友的小站，欢迎去看看。</p>
           <div class="friends reveal">
             {friends.map((f) => (
-              <a class="friend" href={f.url} target="_blank" rel="noopener">
-                <Link2 size={15} />
-                <span>{f.name}</span>
+              <a class="friend-card" href={f.url} target="_blank" rel="noopener">
+                <img class="fc-avatar" src={f.avatar} alt={f.name} loading="lazy" />
+                <div class="fc-main">
+                  <div class="fc-name">{f.name}</div>
+                  <div class="fc-desc">{f.desc}</div>
+                </div>
               </a>
             ))}
           </div>

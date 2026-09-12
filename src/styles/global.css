@@ -244,15 +244,18 @@ img { max-width: 100%; border-radius: 12px; }
 .toc a.depth-3 { padding-left: 16px; font-size: 13px; }
 
 /* 友链 */
-.friends { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
-.friend {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 14px; border: 1px solid var(--border); border-radius: 999px;
-  background: var(--card); color: var(--fg); font-size: 14px;
-  transition: transform .18s ease, border-color .18s;
+.friends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.friend-card {
+  display: flex; gap: 14px; align-items: center;
+  padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px;
+  background: var(--card); color: var(--fg);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-.friend:hover { transform: translateY(-2px); border-color: var(--accent); text-decoration: none; }
-.friend .avatar { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.friend-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); text-decoration: none; }
+.fc-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex: none; background: var(--bg-soft); border: 2px solid var(--border); }
+.fc-name { font-weight: 600; font-size: 14.5px; }
+.fc-desc { color: var(--muted); font-size: 12.5px; margin-top: 3px; line-height: 1.5; }
+@media (max-width: 560px) { .friends { grid-template-columns: 1fr; } }
 
 /* 我的主页: 关于 · B站/Steam */
 .home-links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 8px; }
