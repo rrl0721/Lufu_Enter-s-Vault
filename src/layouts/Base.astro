@@ -77,6 +77,12 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
   </script>
 </head>
 <body class={bodyClass}>
+  <div class="bg-media" aria-hidden="true">
+    <video src="/bg/evening.mp4" poster="/bg/evening.jpg" muted loop playsinline preload="auto"></video>
+    <video src="/bg/aurora.mp4" poster="/bg/aurora.jpg" muted loop playsinline preload="none"></video>
+    <video src="/bg/winter.mp4" poster="/bg/winter.jpg" muted loop playsinline preload="none"></video>
+    <div class="bg-veil"></div>
+  </div>
   <div class="load-bar" id="loadBar" aria-hidden="true"></div>
   {pathname.startsWith('/posts/') && <div class="read-progress" id="readProgress" aria-hidden="true"></div>}
 
@@ -259,6 +265,57 @@ const ogTitle = title === site ? site : `${title} · ${site}`;
             if (p && !p.contains(e.target as Node)) p.classList.remove('open');
           });
         }
+      }
+
+      // 动态背景视频(随区块切换)
+      if (!w.__bgVideos) {
+        w.__bgVideos = true;
+        const initBg = () => {
+          const wrap = document.querySelector('.bg-media') as HTMLElement | null;
+          if (!wrap) return;
+          const vids = Array.from(wrap.querySelectorAll('video'));
+          if (!vids.length) return;
+          const saveData = (navigator as any).connection && (navigator as any).connection.saveData;
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches || saveData || window.innerWidth < 720) {
+            vids.forEach((v) => v.remove());
+            return;
+          }
+          let cur = -1;
+          const setActive = (i: number) => {
+            vids.forEach((v, k) => {
+              const on = k === i;
+              v.classList.toggle('on', on);
+              if (on) { (v as HTMLVideoElement).play().catch(() => {}); }
+              else { (v as HTMLVideoElement).pause(); }
+            });
+          };
+          const map: Record<string, number> = { hero: 0, about: 1, search: 1, gallery: 2, posts: 2, friends: 2 };
+          const hasHero = !!document.getElementById('hero');
+          const update = () => {
+            if (!hasHero) {
+              // 非首页: 直接展示, 用第一段
+              wrap.classList.add('show');
+              if (cur !== 0) { cur = 0; setActive(0); }
+              return;
+            }
+            const y = window.scrollY + 140;
+            let sec = 'hero';
+            for (const id of ['hero', 'about', 'search', 'gallery', 'posts', 'friends']) {
+              const el = document.getElementById(id);
+              if (el && el.getBoundingClientRect().top + window.scrollY <= y) sec = id;
+            }
+            // 封面不显示背景视频
+            wrap.classList.toggle('show', sec !== 'hero');
+            const idx = map[sec] ?? 0;
+            if (idx !== cur) { cur = idx; setActive(idx); }
+          };
+          if (w.__bgScroll) removeEventListener('scroll', w.__bgScroll);
+          w.__bgScroll = update;
+          addEventListener('scroll', w.__bgScroll, { passive: true });
+          update();
+        };
+        document.addEventListener('astro:page-load', initBg);
+        initBg();
       }
 
       // 自定义光标: 首次真实鼠标移动时启用(触屏/减少动效自动跳过)

@@ -183,7 +183,7 @@
     "privacy": "public",
     "memberSince": "August 13, 2025",
     "location": "Gifu, Gifu, Japan",
-    "hours2wk": "0.1",
+    "hours2wk": "0.0",
     "vacBanned": 0,
     "games": [
       {
@@ -206,5 +206,5 @@
     "hoursTotal": 0,
     "gamesPublic": true
   },
-  "updatedAt": "2026-09-12T12:35:52.603Z"
+  "updatedAt": "2026-09-12T13:19:15.475Z"
 }
