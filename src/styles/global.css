@@ -674,6 +674,29 @@ html { background: var(--bg); }
   .page-outline a.active { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 }
 
+/* 档案卡(关于我) */
+.profile-mini {
+  display: flex; gap: 20px; align-items: center;
+  margin-top: 28px; padding: 20px 22px; max-width: 560px;
+  border: 1px solid var(--border); border-radius: 18px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--card)), var(--card) 62%);
+  box-shadow: var(--shadow);
+}
+.pm-avatar {
+  width: 84px; height: 84px; border-radius: 16px; flex: none;
+  object-fit: cover; background: var(--bg-soft);
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.pm-name { font-size: 20px; font-weight: 700; }
+.pm-title { color: var(--accent); font-size: 13.5px; margin-top: 3px; letter-spacing: .3px; }
+.pm-grid { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 13px; }
+.pm-item span { display: block; font-size: 11px; color: var(--muted); letter-spacing: .5px; }
+.pm-item b { font-size: 14px; font-weight: 600; }
+@media (max-width: 560px) {
+  .profile-mini { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .pm-grid { gap: 8px 20px; }
+}
+
 /* 滚动出现动画 */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
 .reveal.in { opacity: 1; transform: none; }
