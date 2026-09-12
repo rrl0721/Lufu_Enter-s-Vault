@@ -6,7 +6,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 <Base>
-  <section class="hero">
+  <section class="hero" data-slide>
     <canvas class="hero-dots" aria-hidden="true"></canvas>
     <img
       class="hero-bg"
@@ -54,7 +54,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     </a>
   </section>
 
-  <section id="posts" class="posts">
+  <section id="posts" class="posts" data-slide>
     <canvas class="posts-fx" aria-hidden="true"></canvas>
     <div class="wrap posts-inner">
       <div class="section-title title-anim">最新文章</div>
@@ -493,32 +493,43 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     document.addEventListener('astro:page-load', initType);
     initType();
 
-    // 首屏封面 → 最新文章: 滚轮磁性翻页 + 锚点按钮(仅首页生效)
+    // 首页磁性翻页: 在所有 [data-slide] 区块之间翻页(滚轮 + 顶栏锚点)
     if (!(window as any).__pptWheel) {
       (window as any).__pptWheel = true;
       let lock = false;
-      const goPosts = () => {
-        const hero = document.querySelector('.hero');
-        if (hero) window.scrollTo({ top: (hero as HTMLElement).offsetHeight, behavior: 'smooth' });
+      const headerH = () => {
+        const h = document.querySelector('.site-header') as HTMLElement | null;
+        return h ? h.offsetHeight : 64;
+      };
+      const slideTops = () =>
+        Array.from(document.querySelectorAll('[data-slide]')).map((el) => {
+          const r = (el as HTMLElement).getBoundingClientRect();
+          return Math.max(0, Math.round(r.top + window.scrollY - headerH()));
+        });
+      const goto = (top: number) => {
+        lock = true;
+        window.scrollTo({ top, behavior: 'smooth' });
+        setTimeout(() => (lock = false), 800);
       };
       window.addEventListener(
         'wheel',
         (e) => {
-          const hero = document.querySelector('.hero');
-          const posts = document.querySelector('.posts');
-          if (!hero || !posts || lock) return;
-          const heroH = (hero as HTMLElement).offsetHeight;
+          if (lock || !document.querySelector('[data-slide]')) return;
+          const tops = slideTops();
+          if (!tops.length) return;
           const y = window.scrollY;
-          if (y < heroH * 0.5 && e.deltaY > 0) {
-            e.preventDefault();
-            lock = true;
-            window.scrollTo({ top: heroH, behavior: 'smooth' });
-            setTimeout(() => (lock = false), 800);
-          } else if (y > 20 && y < heroH * 1.5 && e.deltaY < 0) {
-            e.preventDefault();
-            lock = true;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => (lock = false), 800);
+          if (e.deltaY > 0) {
+            const next = tops.find((t) => t > y + 10);
+            if (next !== undefined) {
+              e.preventDefault();
+              goto(next);
+            }
+          } else if (e.deltaY < 0) {
+            const prev = [...tops].reverse().find((t) => t < y - 10);
+            if (prev !== undefined) {
+              e.preventDefault();
+              goto(prev);
+            }
           }
         },
         { passive: false }
@@ -526,10 +537,16 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
       document.addEventListener('click', (e) => {
         const t = e.target as HTMLElement;
         if (!t.closest) return;
-        if (t.closest('a[href="#posts"]')) {
-          e.preventDefault();
-          goPosts();
+        const a = t.closest('a[data-anchor]') as HTMLAnchorElement | null;
+        if (!a || lock) return;
+        const href = a.getAttribute('href') || '';
+        e.preventDefault();
+        if (href === '#top') {
+          goto(0);
+          return;
         }
+        const el = document.querySelector(href) as HTMLElement | null;
+        if (el) goto(Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY - headerH())));
       });
     }
   </script>
